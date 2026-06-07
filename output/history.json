@@ -1,0 +1,1589 @@
+[
+  {
+    "ts": "2026-06-07T19:55:25.687270",
+    "event": "aria_boot",
+    "version": "0.1"
+  },
+  {
+    "ts": "2026-06-07T19:55:25.906946",
+    "id": "6328609f",
+    "title": "SELF-REPAIR: verify system",
+    "status": "pending",
+    "priority": 6,
+    "difficulty": 0.2003,
+    "retries": 0,
+    "history": [],
+    "result": {},
+    "event": "goal_added"
+  },
+  {
+    "ts": "2026-06-07T19:55:26.108004",
+    "id": "e4d7ea43",
+    "title": "PLAN: Snake game architecture",
+    "status": "pending",
+    "priority": 17,
+    "difficulty": 0.25820000000000004,
+    "retries": 0,
+    "history": [],
+    "result": {},
+    "event": "goal_added"
+  },
+  {
+    "ts": "2026-06-07T19:55:26.309457",
+    "id": "09ea660b",
+    "title": "CODE: write Snake game",
+    "status": "pending",
+    "priority": 32,
+    "difficulty": 0.4135,
+    "retries": 0,
+    "history": [],
+    "result": {},
+    "event": "goal_added"
+  },
+  {
+    "ts": "2026-06-07T19:55:26.510795",
+    "id": "7a56024e",
+    "title": "TEST: validate snake.py",
+    "status": "pending",
+    "priority": 38,
+    "difficulty": 0.2684,
+    "retries": 0,
+    "history": [],
+    "result": {},
+    "event": "goal_added"
+  },
+  {
+    "ts": "2026-06-07T19:55:26.712586",
+    "id": "eedbe715",
+    "title": "LAUNCH: run Snake game",
+    "status": "pending",
+    "priority": 50,
+    "difficulty": 0.33635,
+    "retries": 0,
+    "history": [],
+    "result": {},
+    "event": "goal_added"
+  },
+  {
+    "ts": "2026-06-07T19:55:26.714763",
+    "event": "goal_started",
+    "id": "6328609f",
+    "title": "SELF-REPAIR: verify system"
+  },
+  {
+    "ts": "2026-06-07T19:55:27.067306",
+    "event": "self_repair",
+    "result": "ok"
+  },
+  {
+    "ts": "2026-06-07T19:55:27.468564",
+    "event": "goal_done",
+    "id": "6328609f",
+    "title": "SELF-REPAIR: verify system"
+  },
+  {
+    "ts": "2026-06-07T19:55:27.468928",
+    "event": "goal_started",
+    "id": "e4d7ea43",
+    "title": "PLAN: Snake game architecture"
+  },
+  {
+    "ts": "2026-06-07T19:55:29.172452",
+    "event": "plan_complete",
+    "steps": [
+      "1. Write game constants and color palette",
+      "2. Write Snake class  (movement, collision, draw)",
+      "3. Write Food class   (spawn, pulse animation)",
+      "4. Write Game class   (event loop, HUD, death screen)",
+      "5. Write launch screen  (ARIA completion message)",
+      "6. Assemble all sections into snake.py",
+      "7. Validate syntax",
+      "8. Run import test"
+    ]
+  },
+  {
+    "ts": "2026-06-07T19:55:29.172885",
+    "event": "goal_done",
+    "id": "e4d7ea43",
+    "title": "PLAN: Snake game architecture"
+  },
+  {
+    "ts": "2026-06-07T19:55:29.173840",
+    "event": "goal_started",
+    "id": "09ea660b",
+    "title": "CODE: write Snake game"
+  },
+  {
+    "ts": "2026-06-07T19:55:29.574388",
+    "event": "code_section",
+    "section": "header",
+    "chars": 70
+  },
+  {
+    "ts": "2026-06-07T19:55:29.975005",
+    "event": "code_section",
+    "section": "imports",
+    "chars": 57
+  },
+  {
+    "ts": "2026-06-07T19:55:30.376113",
+    "event": "code_section",
+    "section": "constants",
+    "chars": 133
+  },
+  {
+    "ts": "2026-06-07T19:55:30.778106",
+    "event": "code_section",
+    "section": "colors",
+    "chars": 256
+  },
+  {
+    "ts": "2026-06-07T19:55:31.179354",
+    "event": "code_section",
+    "section": "snake_class",
+    "chars": 1599
+  },
+  {
+    "ts": "2026-06-07T19:55:31.583243",
+    "event": "code_section",
+    "section": "food_class",
+    "chars": 725
+  },
+  {
+    "ts": "2026-06-07T19:55:31.986880",
+    "event": "code_section",
+    "section": "game_class",
+    "chars": 3744
+  },
+  {
+    "ts": "2026-06-07T19:55:32.388749",
+    "event": "code_section",
+    "section": "draw_functions",
+    "chars": 852
+  },
+  {
+    "ts": "2026-06-07T19:55:32.789492",
+    "event": "code_section",
+    "section": "main_loop",
+    "chars": 558
+  },
+  {
+    "ts": "2026-06-07T19:55:33.190648",
+    "event": "code_section",
+    "section": "entry",
+    "chars": 546
+  },
+  {
+    "ts": "2026-06-07T19:55:33.492082",
+    "event": "goal_done",
+    "id": "09ea660b",
+    "title": "CODE: write Snake game"
+  },
+  {
+    "ts": "2026-06-07T19:55:33.493368",
+    "event": "goal_started",
+    "id": "7a56024e",
+    "title": "TEST: validate snake.py"
+  },
+  {
+    "ts": "2026-06-07T19:55:34.238106",
+    "event": "goal_done",
+    "id": "7a56024e",
+    "title": "TEST: validate snake.py"
+  },
+  {
+    "ts": "2026-06-07T19:55:34.238801",
+    "event": "goal_started",
+    "id": "eedbe715",
+    "title": "LAUNCH: run Snake game"
+  },
+  {
+    "ts": "2026-06-07T19:55:36.246211",
+    "event": "goal_done",
+    "id": "eedbe715",
+    "title": "LAUNCH: run Snake game"
+  },
+  {
+    "ts": "2026-06-07T20:26:04.148292",
+    "event": "aria_boot",
+    "version": "2.0"
+  },
+  {
+    "ts": "2026-06-07T20:26:04.460646",
+    "event": "goal_queued",
+    "title": "SELF-REPAIR: system integrity check",
+    "priority": 6,
+    "difficulty": 0.341
+  },
+  {
+    "ts": "2026-06-07T20:26:04.761585",
+    "event": "goal_queued",
+    "title": "PLAN: design build roadmap",
+    "priority": 13,
+    "difficulty": 0.427
+  },
+  {
+    "ts": "2026-06-07T20:26:05.062519",
+    "event": "goal_queued",
+    "title": "DESIGN: architecture",
+    "priority": 16,
+    "difficulty": 0.421
+  },
+  {
+    "ts": "2026-06-07T20:26:05.363680",
+    "event": "goal_queued",
+    "title": "CODE: write program",
+    "priority": 23,
+    "difficulty": 0.424
+  },
+  {
+    "ts": "2026-06-07T20:26:05.664680",
+    "event": "goal_queued",
+    "title": "TEST+FIX: validate and auto-repair",
+    "priority": 33,
+    "difficulty": 0.423
+  },
+  {
+    "ts": "2026-06-07T20:26:05.965593",
+    "event": "goal_queued",
+    "title": "LAUNCH: complete and deliver",
+    "priority": 40,
+    "difficulty": 0.269
+  },
+  {
+    "ts": "2026-06-07T20:26:05.966102",
+    "event": "goal_start",
+    "id": "e8a6322d",
+    "title": "SELF-REPAIR: system integrity check"
+  },
+  {
+    "ts": "2026-06-07T20:26:06.800147",
+    "event": "goal_done",
+    "id": "e8a6322d",
+    "title": "SELF-REPAIR: system integrity check"
+  },
+  {
+    "ts": "2026-06-07T20:26:06.800748",
+    "event": "goal_start",
+    "id": "61b35e86",
+    "title": "PLAN: design build roadmap"
+  },
+  {
+    "ts": "2026-06-07T20:26:08.068892",
+    "event": "goal_failed",
+    "id": "61b35e86",
+    "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 52.073285761s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '52s'}]}}"
+  },
+  {
+    "ts": "2026-06-07T20:26:08.569815",
+    "event": "goal_start",
+    "id": "61b35e86",
+    "title": "PLAN: design build roadmap"
+  },
+  {
+    "ts": "2026-06-07T20:26:08.888378",
+    "event": "goal_failed",
+    "id": "61b35e86",
+    "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 51.295319887s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '51s'}]}}"
+  },
+  {
+    "ts": "2026-06-07T20:26:09.389829",
+    "event": "goal_start",
+    "id": "61b35e86",
+    "title": "PLAN: design build roadmap"
+  },
+  {
+    "ts": "2026-06-07T20:26:09.601927",
+    "event": "goal_failed",
+    "id": "61b35e86",
+    "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 50.502712048s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '50s'}]}}"
+  },
+  {
+    "ts": "2026-06-07T20:26:09.602474",
+    "event": "goal_start",
+    "id": "a18c3578",
+    "title": "DESIGN: architecture"
+  },
+  {
+    "ts": "2026-06-07T20:26:10.216370",
+    "event": "goal_failed",
+    "id": "a18c3578",
+    "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 49.925919778s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '49s'}]}}"
+  },
+  {
+    "ts": "2026-06-07T20:26:10.717561",
+    "event": "goal_start",
+    "id": "a18c3578",
+    "title": "DESIGN: architecture"
+  },
+  {
+    "ts": "2026-06-07T20:26:10.933749",
+    "event": "goal_failed",
+    "id": "a18c3578",
+    "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 49.174663937s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '49s'}]}}"
+  },
+  {
+    "ts": "2026-06-07T20:26:11.435202",
+    "event": "goal_start",
+    "id": "a18c3578",
+    "title": "DESIGN: architecture"
+  },
+  {
+    "ts": "2026-06-07T20:26:11.651433",
+    "event": "goal_failed",
+    "id": "a18c3578",
+    "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 48.45012684s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '48s'}]}}"
+  },
+  {
+    "ts": "2026-06-07T20:26:11.651993",
+    "event": "goal_start",
+    "id": "16cde75a",
+    "title": "CODE: write program"
+  },
+  {
+    "ts": "2026-06-07T20:26:11.653109",
+    "event": "goal_failed",
+    "id": "16cde75a",
+    "error": "Plan not ready yet"
+  },
+  {
+    "ts": "2026-06-07T20:26:12.154271",
+    "event": "goal_start",
+    "id": "16cde75a",
+    "title": "CODE: write program"
+  },
+  {
+    "ts": "2026-06-07T20:26:12.156087",
+    "event": "goal_failed",
+    "id": "16cde75a",
+    "error": "Plan not ready yet"
+  },
+  {
+    "ts": "2026-06-07T20:26:12.656915",
+    "event": "goal_start",
+    "id": "16cde75a",
+    "title": "CODE: write program"
+  },
+  {
+    "ts": "2026-06-07T20:26:12.657537",
+    "event": "goal_failed",
+    "id": "16cde75a",
+    "error": "Plan not ready yet"
+  },
+  {
+    "ts": "2026-06-07T20:26:12.658476",
+    "event": "goal_start",
+    "id": "f532e034",
+    "title": "TEST+FIX: validate and auto-repair"
+  },
+  {
+    "ts": "2026-06-07T20:26:12.659009",
+    "event": "goal_failed",
+    "id": "f532e034",
+    "error": "No code to test"
+  },
+  {
+    "ts": "2026-06-07T20:26:13.159723",
+    "event": "goal_start",
+    "id": "f532e034",
+    "title": "TEST+FIX: validate and auto-repair"
+  },
+  {
+    "ts": "2026-06-07T20:26:13.160909",
+    "event": "goal_failed",
+    "id": "f532e034",
+    "error": "No code to test"
+  },
+  {
+    "ts": "2026-06-07T20:26:13.661757",
+    "event": "goal_start",
+    "id": "f532e034",
+    "title": "TEST+FIX: validate and auto-repair"
+  },
+  {
+    "ts": "2026-06-07T20:26:13.662344",
+    "event": "goal_failed",
+    "id": "f532e034",
+    "error": "No code to test"
+  },
+  {
+    "ts": "2026-06-07T20:26:13.663393",
+    "event": "goal_start",
+    "id": "af046ba9",
+    "title": "LAUNCH: complete and deliver"
+  },
+  {
+    "ts": "2026-06-07T20:26:13.903893",
+    "event": "goal_failed",
+    "id": "af046ba9",
+    "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 46.196382145s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '46s'}]}}"
+  },
+  {
+    "ts": "2026-06-07T20:26:14.406216",
+    "event": "goal_start",
+    "id": "af046ba9",
+    "title": "LAUNCH: complete and deliver"
+  },
+  {
+    "ts": "2026-06-07T20:26:14.634901",
+    "event": "goal_failed",
+    "id": "af046ba9",
+    "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 45.456840821s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '45s'}]}}"
+  },
+  {
+    "ts": "2026-06-07T20:26:15.136345",
+    "event": "goal_start",
+    "id": "af046ba9",
+    "title": "LAUNCH: complete and deliver"
+  },
+  {
+    "ts": "2026-06-07T20:26:15.440266",
+    "event": "goal_failed",
+    "id": "af046ba9",
+    "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 44.732526905s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '44s'}]}}"
+  },
+  {
+    "ts": "2026-06-07T20:42:05.243976",
+    "event": "aria_boot",
+    "version": "2.0"
+  },
+  {
+    "ts": "2026-06-07T20:42:05.570091",
+    "event": "goal_queued",
+    "title": "SELF-REPAIR: system integrity check",
+    "priority": 7,
+    "difficulty": 0.354
+  },
+  {
+    "ts": "2026-06-07T20:42:05.872987",
+    "event": "goal_queued",
+    "title": "PLAN: design build roadmap",
+    "priority": 13,
+    "difficulty": 0.445
+  },
+  {
+    "ts": "2026-06-07T20:42:06.174647",
+    "event": "goal_queued",
+    "title": "DESIGN: architecture",
+    "priority": 16,
+    "difficulty": 0.439
+  },
+  {
+    "ts": "2026-06-07T20:42:06.476852",
+    "event": "goal_queued",
+    "title": "CODE: write program",
+    "priority": 23,
+    "difficulty": 0.437
+  },
+  {
+    "ts": "2026-06-07T20:42:06.778425",
+    "event": "goal_queued",
+    "title": "TEST+FIX: validate and auto-repair",
+    "priority": 33,
+    "difficulty": 0.443
+  },
+  {
+    "ts": "2026-06-07T20:42:07.079705",
+    "event": "goal_queued",
+    "title": "LAUNCH: complete and deliver",
+    "priority": 40,
+    "difficulty": 0.283
+  },
+  {
+    "ts": "2026-06-07T20:42:07.080575",
+    "event": "goal_start",
+    "id": "37a4fe6a",
+    "title": "SELF-REPAIR: system integrity check"
+  },
+  {
+    "ts": "2026-06-07T20:42:08.610159",
+    "event": "goal_done",
+    "id": "37a4fe6a",
+    "title": "SELF-REPAIR: system integrity check"
+  },
+  {
+    "ts": "2026-06-07T20:42:08.612599",
+    "event": "goal_start",
+    "id": "27ecc882",
+    "title": "PLAN: design build roadmap"
+  },
+  {
+    "ts": "2026-06-07T20:42:09.924530",
+    "event": "goal_failed",
+    "id": "27ecc882",
+    "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 50.196068209s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '50s'}]}}"
+  },
+  {
+    "ts": "2026-06-07T20:42:10.427121",
+    "event": "goal_start",
+    "id": "27ecc882",
+    "title": "PLAN: design build roadmap"
+  },
+  {
+    "ts": "2026-06-07T20:42:10.737025",
+    "event": "goal_failed",
+    "id": "27ecc882",
+    "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 49.431148403s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '49s'}]}}"
+  },
+  {
+    "ts": "2026-06-07T20:42:11.238890",
+    "event": "goal_start",
+    "id": "27ecc882",
+    "title": "PLAN: design build roadmap"
+  },
+  {
+    "ts": "2026-06-07T20:42:11.451235",
+    "event": "goal_failed",
+    "id": "27ecc882",
+    "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 48.655070084s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '48s'}]}}"
+  },
+  {
+    "ts": "2026-06-07T20:42:11.452110",
+    "event": "goal_start",
+    "id": "88d1e74a",
+    "title": "DESIGN: architecture"
+  },
+  {
+    "ts": "2026-06-07T20:42:12.023607",
+    "event": "goal_failed",
+    "id": "88d1e74a",
+    "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 48.071568442s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '48s'}]}}"
+  },
+  {
+    "ts": "2026-06-07T20:42:12.525540",
+    "event": "goal_start",
+    "id": "88d1e74a",
+    "title": "DESIGN: architecture"
+  },
+  {
+    "ts": "2026-06-07T20:42:12.786721",
+    "event": "goal_failed",
+    "id": "88d1e74a",
+    "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 47.378892277s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '47s'}]}}"
+  },
+  {
+    "ts": "2026-06-07T20:42:13.290004",
+    "event": "goal_start",
+    "id": "88d1e74a",
+    "title": "DESIGN: architecture"
+  },
+  {
+    "ts": "2026-06-07T20:42:13.494475",
+    "event": "goal_failed",
+    "id": "88d1e74a",
+    "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 46.597836078s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '46s'}]}}"
+  },
+  {
+    "ts": "2026-06-07T20:42:13.495441",
+    "event": "goal_start",
+    "id": "90ddd0f9",
+    "title": "CODE: write program"
+  },
+  {
+    "ts": "2026-06-07T20:42:13.498527",
+    "event": "goal_failed",
+    "id": "90ddd0f9",
+    "error": "Plan not ready yet"
+  },
+  {
+    "ts": "2026-06-07T20:42:14.000895",
+    "event": "goal_start",
+    "id": "90ddd0f9",
+    "title": "CODE: write program"
+  },
+  {
+    "ts": "2026-06-07T20:42:14.004512",
+    "event": "goal_failed",
+    "id": "90ddd0f9",
+    "error": "Plan not ready yet"
+  },
+  {
+    "ts": "2026-06-07T20:42:14.506211",
+    "event": "goal_start",
+    "id": "90ddd0f9",
+    "title": "CODE: write program"
+  },
+  {
+    "ts": "2026-06-07T20:42:14.507220",
+    "event": "goal_failed",
+    "id": "90ddd0f9",
+    "error": "Plan not ready yet"
+  },
+  {
+    "ts": "2026-06-07T20:42:14.508166",
+    "event": "goal_start",
+    "id": "56154939",
+    "title": "TEST+FIX: validate and auto-repair"
+  },
+  {
+    "ts": "2026-06-07T20:42:14.508987",
+    "event": "goal_failed",
+    "id": "56154939",
+    "error": "No code to test"
+  },
+  {
+    "ts": "2026-06-07T20:42:15.010163",
+    "event": "goal_start",
+    "id": "56154939",
+    "title": "TEST+FIX: validate and auto-repair"
+  },
+  {
+    "ts": "2026-06-07T20:42:15.011118",
+    "event": "goal_failed",
+    "id": "56154939",
+    "error": "No code to test"
+  },
+  {
+    "ts": "2026-06-07T20:42:15.512576",
+    "event": "goal_start",
+    "id": "56154939",
+    "title": "TEST+FIX: validate and auto-repair"
+  },
+  {
+    "ts": "2026-06-07T20:42:15.513739",
+    "event": "goal_failed",
+    "id": "56154939",
+    "error": "No code to test"
+  },
+  {
+    "ts": "2026-06-07T20:42:15.514846",
+    "event": "goal_start",
+    "id": "cbf9142f",
+    "title": "LAUNCH: complete and deliver"
+  },
+  {
+    "ts": "2026-06-07T20:42:15.856793",
+    "event": "goal_failed",
+    "id": "cbf9142f",
+    "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 44.347574522s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '44s'}]}}"
+  },
+  {
+    "ts": "2026-06-07T20:42:16.358706",
+    "event": "goal_start",
+    "id": "cbf9142f",
+    "title": "LAUNCH: complete and deliver"
+  },
+  {
+    "ts": "2026-06-07T20:42:16.673880",
+    "event": "goal_failed",
+    "id": "cbf9142f",
+    "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 43.514803408s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '43s'}]}}"
+  },
+  {
+    "ts": "2026-06-07T20:42:17.176303",
+    "event": "goal_start",
+    "id": "cbf9142f",
+    "title": "LAUNCH: complete and deliver"
+  },
+  {
+    "ts": "2026-06-07T20:42:17.395868",
+    "event": "goal_failed",
+    "id": "cbf9142f",
+    "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 42.696359767s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '42s'}]}}"
+  },
+  {
+    "ts": "2026-06-07T20:43:54.310646",
+    "event": "aria_boot",
+    "version": "3.0",
+    "providers": [
+      "Google Gemini",
+      "GitHub Models",
+      "Groq"
+    ]
+  },
+  {
+    "ts": "2026-06-07T20:43:54.632027",
+    "event": "goal_queued",
+    "title": "SELF-REPAIR: system integrity check",
+    "priority": 7,
+    "difficulty": 0.353
+  },
+  {
+    "ts": "2026-06-07T20:43:54.934196",
+    "event": "goal_queued",
+    "title": "PLAN: design build roadmap",
+    "priority": 13,
+    "difficulty": 0.439
+  },
+  {
+    "ts": "2026-06-07T20:43:55.235630",
+    "event": "goal_queued",
+    "title": "DESIGN: architecture",
+    "priority": 17,
+    "difficulty": 0.45
+  },
+  {
+    "ts": "2026-06-07T20:43:55.538508",
+    "event": "goal_queued",
+    "title": "CODE: write program",
+    "priority": 23,
+    "difficulty": 0.433
+  },
+  {
+    "ts": "2026-06-07T20:43:55.842341",
+    "event": "goal_queued",
+    "title": "TEST+FIX: validate and auto-repair",
+    "priority": 33,
+    "difficulty": 0.439
+  },
+  {
+    "ts": "2026-06-07T20:43:56.145984",
+    "event": "goal_queued",
+    "title": "LAUNCH: complete and deliver",
+    "priority": 40,
+    "difficulty": 0.288
+  },
+  {
+    "ts": "2026-06-07T20:43:56.147813",
+    "event": "goal_start",
+    "id": "88cd0031",
+    "title": "SELF-REPAIR: system integrity check"
+  },
+  {
+    "ts": "2026-06-07T20:43:57.766053",
+    "event": "goal_done",
+    "id": "88cd0031",
+    "title": "SELF-REPAIR: system integrity check"
+  },
+  {
+    "ts": "2026-06-07T20:43:57.768583",
+    "event": "goal_start",
+    "id": "ae72d94b",
+    "title": "PLAN: design build roadmap"
+  },
+  {
+    "ts": "2026-06-07T20:43:58.864613",
+    "event": "provider_fallback",
+    "from": "Google Gemini",
+    "to": "GitHub Models",
+    "reason": "Gemini quota hit: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and "
+  },
+  {
+    "ts": "2026-06-07T20:44:04.003110",
+    "event": "ai_call",
+    "provider": "GitHub Models",
+    "prompt_preview": "\nYou are planning how to build: \"snake game\"\n\nReturn a JSON array of build steps. Each step has:\n  \"name\"        \u2014 short identifier (snake_case)\n  \"description\" \u2014 one sentence what this step does\n  \"t",
+    "response_chars": 1219
+  },
+  {
+    "ts": "2026-06-07T20:44:04.005368",
+    "event": "plan_created",
+    "task": "snake game",
+    "steps": [
+      {
+        "name": "design_game_mechanics",
+        "description": "Plan the rules and mechanics of the snake game",
+        "type": "design"
+      },
+      {
+        "name": "design_ui_layout",
+        "description": "Sketch the layout of the game screen and UI elements",
+        "type": "design"
+      },
+      {
+        "name": "write_game_loop",
+        "description": "Implement the main game loop to handle updates and rendering",
+        "type": "code"
+      },
+      {
+        "name": "write_snake_logic",
+        "description": "Code the movement and growth mechanics for the snake",
+        "type": "code"
+      },
+      {
+        "name": "write_food_logic",
+        "description": "Implement the spawning and consumption mechanics for food",
+        "type": "code"
+      },
+      {
+        "name": "write_collision_detection",
+        "description": "Add logic to detect collisions with walls and the snake itself",
+        "type": "code"
+      },
+      {
+        "name": "write_score_tracking",
+        "description": "Implement functionality to track and display the player's score",
+        "type": "code"
+      },
+      {
+        "name": "test_game_mechanics",
+        "description": "Test the game mechanics to ensure proper functionality",
+        "type": "test"
+      },
+      {
+        "name": "fix_bugs",
+        "description": "Identify and resolve any issues found during testing",
+        "type": "fix"
+      },
+      {
+        "name": "launch_game",
+        "description": "Deploy the game for players to enjoy",
+        "type": "launch"
+      }
+    ]
+  },
+  {
+    "ts": "2026-06-07T20:44:04.009572",
+    "event": "goal_done",
+    "id": "ae72d94b",
+    "title": "PLAN: design build roadmap"
+  },
+  {
+    "ts": "2026-06-07T20:44:04.011704",
+    "event": "goal_start",
+    "id": "864fa425",
+    "title": "DESIGN: architecture"
+  },
+  {
+    "ts": "2026-06-07T20:44:08.795006",
+    "event": "ai_call",
+    "provider": "GitHub Models",
+    "prompt_preview": "\nDesign the architecture for: \"snake game\"\nDescribe (no code yet):\n1. Python libraries to use and why\n2. Classes/modules to create\n3. How the main loop works\n4. Key design decisions\nBe brief \u2014 interna",
+    "response_chars": 1312
+  },
+  {
+    "ts": "2026-06-07T20:44:08.797820",
+    "event": "goal_done",
+    "id": "864fa425",
+    "title": "DESIGN: architecture"
+  },
+  {
+    "ts": "2026-06-07T20:44:08.799384",
+    "event": "goal_start",
+    "id": "3bb68da3",
+    "title": "CODE: write program"
+  },
+  {
+    "ts": "2026-06-07T20:44:11.660728",
+    "event": "ai_call",
+    "provider": "GitHub Models",
+    "prompt_preview": "\nBuild step \"write_game_loop\" for: \"snake game\"\nThis step: Implement the main game loop to handle updates and rendering\nOutput ONLY valid Python code. No markdown. No explanation.\nUse pygame for any g",
+    "response_chars": 1040
+  },
+  {
+    "ts": "2026-06-07T20:44:11.663891",
+    "event": "code_written",
+    "step": "write_game_loop",
+    "chars": 1040
+  },
+  {
+    "ts": "2026-06-07T20:44:16.370549",
+    "event": "ai_call",
+    "provider": "GitHub Models",
+    "prompt_preview": "\nYou are building \"snake game\" step by step.\nExisting code so far:\nimport pygame\nimport sys\n\nclass Game:\n    def __init__(self, width, height, cell_size, fps):\n        pygame.init()\n        self.width",
+    "response_chars": 2895
+  },
+  {
+    "ts": "2026-06-07T20:44:16.373626",
+    "event": "code_written",
+    "step": "write_snake_logic",
+    "chars": 2895
+  },
+  {
+    "ts": "2026-06-07T20:44:21.386154",
+    "event": "ai_call",
+    "provider": "GitHub Models",
+    "prompt_preview": "\nYou are building \"snake game\" step by step.\nExisting code so far:\nimport pygame\nimport sys\n\nclass Snake:\n    def __init__(self, x, y, cell_size):\n        self.cell_size = cell_size\n        self.body ",
+    "response_chars": 3779
+  },
+  {
+    "ts": "2026-06-07T20:44:21.389257",
+    "event": "code_written",
+    "step": "write_food_logic",
+    "chars": 3779
+  },
+  {
+    "ts": "2026-06-07T20:44:26.743606",
+    "event": "ai_call",
+    "provider": "GitHub Models",
+    "prompt_preview": "\nYou are building \"snake game\" step by step.\nExisting code so far:\n        self.direction = direction\n\n    def check_collision(self, width, height):\n        head_x, head_y = self.body[0]\n        # Che",
+    "response_chars": 3994
+  },
+  {
+    "ts": "2026-06-07T20:44:26.746743",
+    "event": "code_written",
+    "step": "write_collision_detection",
+    "chars": 3994
+  },
+  {
+    "ts": "2026-06-07T20:44:32.442189",
+    "event": "ai_call",
+    "provider": "GitHub Models",
+    "prompt_preview": "\nYou are building \"snake game\" step by step.\nExisting code so far:\n >= height:\n            return True\n        # Check self-collision\n        if (head_x, head_y) in self.body[1:]:\n            return T",
+    "response_chars": 4253
+  },
+  {
+    "ts": "2026-06-07T20:44:32.443471",
+    "event": "code_written",
+    "step": "write_score_tracking",
+    "chars": 4253
+  },
+  {
+    "ts": "2026-06-07T20:44:32.444570",
+    "event": "goal_done",
+    "id": "3bb68da3",
+    "title": "CODE: write program"
+  },
+  {
+    "ts": "2026-06-07T20:44:32.445688",
+    "event": "goal_start",
+    "id": "2ebb5e67",
+    "title": "TEST+FIX: validate and auto-repair"
+  },
+  {
+    "ts": "2026-06-07T20:44:32.510589",
+    "event": "test_passed",
+    "attempts": 1
+  },
+  {
+    "ts": "2026-06-07T20:44:32.516383",
+    "event": "goal_done",
+    "id": "2ebb5e67",
+    "title": "TEST+FIX: validate and auto-repair"
+  },
+  {
+    "ts": "2026-06-07T20:44:32.518865",
+    "event": "goal_start",
+    "id": "6163a27b",
+    "title": "LAUNCH: complete and deliver"
+  },
+  {
+    "ts": "2026-06-07T20:44:32.808482",
+    "event": "provider_fallback",
+    "from": "GitHub Models",
+    "to": "Groq",
+    "reason": "GitHub Models error: Error code: 413 - {'error': {'code': 'tokens_limit_reached', 'message': 'Request body too large for gpt-4o model. Max si"
+  },
+  {
+    "ts": "2026-06-07T20:44:33.160389",
+    "event": "goal_failed",
+    "id": "6163a27b",
+    "error": "All providers exhausted. Last error: Groq error: Error code: 400 - {'error': {'message': 'The model `llama-3.1-70b-versatile` has been decommissioned and is no longer su\nAdd more API keys or wait for quota reset."
+  },
+  {
+    "ts": "2026-06-07T20:44:33.663411",
+    "event": "goal_start",
+    "id": "6163a27b",
+    "title": "LAUNCH: complete and deliver"
+  },
+  {
+    "ts": "2026-06-07T20:44:33.666149",
+    "event": "goal_failed",
+    "id": "6163a27b",
+    "error": "list index out of range"
+  },
+  {
+    "ts": "2026-06-07T20:44:34.170408",
+    "event": "goal_start",
+    "id": "6163a27b",
+    "title": "LAUNCH: complete and deliver"
+  },
+  {
+    "ts": "2026-06-07T20:44:34.175793",
+    "event": "goal_failed",
+    "id": "6163a27b",
+    "error": "list index out of range"
+  },
+  {
+    "ts": "2026-06-07T23:48:51.129315",
+    "event": "aria_boot",
+    "version": "3.0",
+    "providers": [
+      "Google Gemini",
+      "GitHub Models",
+      "Groq"
+    ]
+  },
+  {
+    "ts": "2026-06-07T23:48:51.465399",
+    "event": "goal_queued",
+    "title": "SELF-REPAIR: system integrity check",
+    "priority": 7,
+    "difficulty": 0.357
+  },
+  {
+    "ts": "2026-06-07T23:48:51.767982",
+    "event": "goal_queued",
+    "title": "PLAN: design build roadmap",
+    "priority": 14,
+    "difficulty": 0.456
+  },
+  {
+    "ts": "2026-06-07T23:48:52.073762",
+    "event": "goal_queued",
+    "title": "DESIGN: architecture",
+    "priority": 16,
+    "difficulty": 0.443
+  },
+  {
+    "ts": "2026-06-07T23:48:52.378689",
+    "event": "goal_queued",
+    "title": "CODE: write program",
+    "priority": 23,
+    "difficulty": 0.443
+  },
+  {
+    "ts": "2026-06-07T23:48:52.682110",
+    "event": "goal_queued",
+    "title": "TEST+FIX: validate and auto-repair",
+    "priority": 34,
+    "difficulty": 0.451
+  },
+  {
+    "ts": "2026-06-07T23:48:52.986827",
+    "event": "goal_queued",
+    "title": "LAUNCH: complete and deliver",
+    "priority": 40,
+    "difficulty": 0.292
+  },
+  {
+    "ts": "2026-06-07T23:48:52.991498",
+    "event": "goal_start",
+    "id": "b1742c73",
+    "title": "SELF-REPAIR: system integrity check"
+  },
+  {
+    "ts": "2026-06-07T23:48:55.319079",
+    "event": "goal_done",
+    "id": "b1742c73",
+    "title": "SELF-REPAIR: system integrity check"
+  },
+  {
+    "ts": "2026-06-07T23:48:55.323134",
+    "event": "goal_start",
+    "id": "d835e731",
+    "title": "PLAN: design build roadmap"
+  },
+  {
+    "ts": "2026-06-07T23:48:56.114919",
+    "event": "provider_fallback",
+    "from": "Google Gemini",
+    "to": "GitHub Models",
+    "reason": "Gemini quota hit: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and "
+  },
+  {
+    "ts": "2026-06-07T23:49:01.046860",
+    "event": "ai_call",
+    "provider": "GitHub Models",
+    "prompt_preview": "\nYou are planning how to build: \"snake game\"\n\nReturn a JSON array of build steps. Each step has:\n  \"name\"        \u2014 short identifier (snake_case)\n  \"description\" \u2014 one sentence what this step does\n  \"t",
+    "response_chars": 1039
+  },
+  {
+    "ts": "2026-06-07T23:49:01.050392",
+    "event": "plan_created",
+    "task": "snake game",
+    "steps": [
+      {
+        "name": "design_game_mechanics",
+        "description": "Plan snake movement, food spawning, and scoring system",
+        "type": "design"
+      },
+      {
+        "name": "design_ui",
+        "description": "Sketch the layout for game screen and controls",
+        "type": "design"
+      },
+      {
+        "name": "code_game_loop",
+        "description": "Implement the main game loop for updates and rendering",
+        "type": "code"
+      },
+      {
+        "name": "code_snake_movement",
+        "description": "Write logic for snake movement and direction changes",
+        "type": "code"
+      },
+      {
+        "name": "code_food_spawning",
+        "description": "Implement food spawning and collision detection",
+        "type": "code"
+      },
+      {
+        "name": "code_scoring_system",
+        "description": "Add scoring mechanism and display score on screen",
+        "type": "code"
+      },
+      {
+        "name": "test_game_mechanics",
+        "description": "Test snake movement, food spawning, and scoring system",
+        "type": "test"
+      },
+      {
+        "name": "fix_bugs",
+        "description": "Resolve any issues found during testing",
+        "type": "fix"
+      },
+      {
+        "name": "launch_game",
+        "description": "Release the snake game for users to play",
+        "type": "launch"
+      }
+    ]
+  },
+  {
+    "ts": "2026-06-07T23:49:01.056182",
+    "event": "goal_done",
+    "id": "d835e731",
+    "title": "PLAN: design build roadmap"
+  },
+  {
+    "ts": "2026-06-07T23:49:01.061372",
+    "event": "goal_start",
+    "id": "23f5d21b",
+    "title": "DESIGN: architecture"
+  },
+  {
+    "ts": "2026-06-07T23:49:04.609571",
+    "event": "ai_call",
+    "provider": "GitHub Models",
+    "prompt_preview": "\nDesign the architecture for: \"snake game\"\nDescribe (no code yet):\n1. Python libraries to use and why\n2. Classes/modules to create\n3. How the main loop works\n4. Key design decisions\nBe brief \u2014 interna",
+    "response_chars": 1353
+  },
+  {
+    "ts": "2026-06-07T23:49:04.612454",
+    "event": "goal_done",
+    "id": "23f5d21b",
+    "title": "DESIGN: architecture"
+  },
+  {
+    "ts": "2026-06-07T23:49:04.615190",
+    "event": "goal_start",
+    "id": "2d3f7f5f",
+    "title": "CODE: write program"
+  },
+  {
+    "ts": "2026-06-07T23:49:07.166462",
+    "event": "ai_call",
+    "provider": "GitHub Models",
+    "prompt_preview": "\nBuild step \"code_game_loop\" for: \"snake game\"\nThis step: Implement the main game loop for updates and rendering\nOutput ONLY valid Python code. No markdown. No explanation.\nUse pygame for any game/vis",
+    "response_chars": 928
+  },
+  {
+    "ts": "2026-06-07T23:49:07.169877",
+    "event": "code_written",
+    "step": "code_game_loop",
+    "chars": 928
+  },
+  {
+    "ts": "2026-06-07T23:49:10.339415",
+    "event": "ai_call",
+    "provider": "GitHub Models",
+    "prompt_preview": "\nYou are building \"snake game\" step by step.\nExisting code so far:\nimport pygame\nimport sys\n\ndef code_game_loop():\n    pygame.init()\n\n    # Screen dimensions\n    WIDTH, HEIGHT = 800, 600\n    CELL_SIZE",
+    "response_chars": 1937
+  },
+  {
+    "ts": "2026-06-07T23:49:10.340943",
+    "event": "code_written",
+    "step": "code_snake_movement",
+    "chars": 1937
+  },
+  {
+    "ts": "2026-06-07T23:49:13.824960",
+    "event": "ai_call",
+    "provider": "GitHub Models",
+    "prompt_preview": "\nYou are building \"snake game\" step by step.\nExisting code so far:\nimport pygame\nimport sys\n\ndef code_game_loop():\n    pygame.init()\n\n    # Screen dimensions\n    WIDTH, HEIGHT = 800, 600\n    CELL_SIZE",
+    "response_chars": 2613
+  },
+  {
+    "ts": "2026-06-07T23:49:13.828174",
+    "event": "code_written",
+    "step": "code_food_spawning",
+    "chars": 2613
+  },
+  {
+    "ts": "2026-06-07T23:49:18.124328",
+    "event": "ai_call",
+    "provider": "GitHub Models",
+    "prompt_preview": "\nYou are building \"snake game\" step by step.\nExisting code so far:\nimport pygame\nimport sys\nimport random\n\ndef code_game_loop():\n    pygame.init()\n\n    # Screen dimensions\n    WIDTH, HEIGHT = 800, 600",
+    "response_chars": 2956
+  },
+  {
+    "ts": "2026-06-07T23:49:18.127897",
+    "event": "code_written",
+    "step": "code_scoring_system",
+    "chars": 2956
+  },
+  {
+    "ts": "2026-06-07T23:49:18.131592",
+    "event": "goal_done",
+    "id": "2d3f7f5f",
+    "title": "CODE: write program"
+  },
+  {
+    "ts": "2026-06-07T23:49:18.133832",
+    "event": "goal_start",
+    "id": "b9007920",
+    "title": "TEST+FIX: validate and auto-repair"
+  },
+  {
+    "ts": "2026-06-07T23:49:18.215091",
+    "event": "test_passed",
+    "attempts": 1
+  },
+  {
+    "ts": "2026-06-07T23:49:18.220124",
+    "event": "goal_done",
+    "id": "b9007920",
+    "title": "TEST+FIX: validate and auto-repair"
+  },
+  {
+    "ts": "2026-06-07T23:49:18.223916",
+    "event": "goal_start",
+    "id": "15d89135",
+    "title": "LAUNCH: complete and deliver"
+  },
+  {
+    "ts": "2026-06-07T23:49:21.397729",
+    "event": "ai_call",
+    "provider": "GitHub Models",
+    "prompt_preview": "ARIA built: \"snake game\"\nLog:\n\u21b7 fallback Google Gemini \u2192 GitHub Models\n\u2713 PLAN: design build roadmap\n\u2713 DESIGN: architecture\n\u2713 CODE: write program\n\u2b21 tests passed (attempts: 1)\n\u2713 TEST+FIX: validate and a",
+    "response_chars": 405
+  },
+  {
+    "ts": "2026-06-07T23:49:21.399569",
+    "event": "task_complete",
+    "task": "snake game",
+    "output": "output/snake_game.py",
+    "reflection": "The development process was efficient, with a clear roadmap and successful implementation of each step, including game loop, snake movement, food spawning, and scoring, all validated with passing tests on the first attempt. To improve, future iterations could incorporate more advanced features like difficulty levels or obstacle generation earlier in the roadmap for a more comprehensive game experience."
+  },
+  {
+    "ts": "2026-06-07T23:49:26.772188",
+    "event": "goal_done",
+    "id": "15d89135",
+    "title": "LAUNCH: complete and deliver"
+  },
+  {
+    "ts": "2026-06-07T23:55:11.458341",
+    "event": "aria_boot",
+    "version": "3.0",
+    "providers": [
+      "Google Gemini",
+      "GitHub Models",
+      "Groq"
+    ]
+  },
+  {
+    "ts": "2026-06-07T23:55:11.780848",
+    "event": "goal_queued",
+    "title": "SELF-REPAIR: system integrity check",
+    "priority": 7,
+    "difficulty": 0.384
+  },
+  {
+    "ts": "2026-06-07T23:55:12.086328",
+    "event": "goal_queued",
+    "title": "PLAN: design build roadmap",
+    "priority": 12,
+    "difficulty": 0.374
+  },
+  {
+    "ts": "2026-06-07T23:55:12.391542",
+    "event": "goal_queued",
+    "title": "DESIGN: architecture",
+    "priority": 15,
+    "difficulty": 0.378
+  },
+  {
+    "ts": "2026-06-07T23:55:12.701888",
+    "event": "goal_queued",
+    "title": "CODE: write program",
+    "priority": 20,
+    "difficulty": 0.299
+  },
+  {
+    "ts": "2026-06-07T23:55:13.014282",
+    "event": "goal_queued",
+    "title": "TEST+FIX: validate and auto-repair",
+    "priority": 33,
+    "difficulty": 0.449
+  },
+  {
+    "ts": "2026-06-07T23:55:13.316309",
+    "event": "goal_queued",
+    "title": "LAUNCH: complete and deliver",
+    "priority": 40,
+    "difficulty": 0.292
+  },
+  {
+    "ts": "2026-06-07T23:55:13.317839",
+    "event": "goal_start",
+    "id": "630b2a2c",
+    "title": "SELF-REPAIR: system integrity check"
+  },
+  {
+    "ts": "2026-06-07T23:55:15.439991",
+    "event": "goal_done",
+    "id": "630b2a2c",
+    "title": "SELF-REPAIR: system integrity check"
+  },
+  {
+    "ts": "2026-06-07T23:55:15.445038",
+    "event": "goal_start",
+    "id": "d094d633",
+    "title": "PLAN: design build roadmap"
+  },
+  {
+    "ts": "2026-06-07T23:55:16.933716",
+    "event": "provider_fallback",
+    "from": "Google Gemini",
+    "to": "GitHub Models",
+    "reason": "Gemini quota hit: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and "
+  },
+  {
+    "ts": "2026-06-07T23:55:23.384992",
+    "event": "ai_call",
+    "provider": "GitHub Models",
+    "prompt_preview": "\nYou are planning how to build: \"tetris\"\n\nReturn a JSON array of build steps. Each step has:\n  \"name\"        \u2014 short identifier (snake_case)\n  \"description\" \u2014 one sentence what this step does\n  \"type\"",
+    "response_chars": 1596
+  },
+  {
+    "ts": "2026-06-07T23:55:23.388410",
+    "event": "plan_created",
+    "task": "tetris",
+    "steps": [
+      {
+        "name": "design_game_mechanics",
+        "description": "Define gameplay rules, controls, and scoring system",
+        "type": "design"
+      },
+      {
+        "name": "design_architecture",
+        "description": "Plan the structure of the game including classes and game loop",
+        "type": "design"
+      },
+      {
+        "name": "code_core_logic",
+        "description": "Implement the game loop and core mechanics like piece movement and rotation",
+        "type": "code"
+      },
+      {
+        "name": "code_piece_handling",
+        "description": "Write logic for generating, moving, and rotating Tetris pieces",
+        "type": "code"
+      },
+      {
+        "name": "code_collision_detection",
+        "description": "Implement collision detection for pieces and boundaries",
+        "type": "code"
+      },
+      {
+        "name": "code_line_clearing",
+        "description": "Write logic to detect and clear completed lines",
+        "type": "code"
+      },
+      {
+        "name": "code_scoring_system",
+        "description": "Implement the scoring system based on cleared lines",
+        "type": "code"
+      },
+      {
+        "name": "code_rendering",
+        "description": "Develop the visual representation of the game board and pieces",
+        "type": "code"
+      },
+      {
+        "name": "code_user_input",
+        "description": "Implement controls for player input to move and rotate pieces",
+        "type": "code"
+      },
+      {
+        "name": "test_gameplay",
+        "description": "Test the gameplay mechanics and fix any issues",
+        "type": "test"
+      },
+      {
+        "name": "test_edge_cases",
+        "description": "Validate behavior for edge cases like stacking and rapid inputs",
+        "type": "test"
+      },
+      {
+        "name": "fix_bugs",
+        "description": "Address any bugs or issues found during testing",
+        "type": "fix"
+      },
+      {
+        "name": "launch_game",
+        "description": "Release the completed Tetris game",
+        "type": "launch"
+      }
+    ]
+  },
+  {
+    "ts": "2026-06-07T23:55:23.392541",
+    "event": "goal_done",
+    "id": "d094d633",
+    "title": "PLAN: design build roadmap"
+  },
+  {
+    "ts": "2026-06-07T23:55:23.397499",
+    "event": "goal_start",
+    "id": "a4f9d868",
+    "title": "DESIGN: architecture"
+  },
+  {
+    "ts": "2026-06-07T23:55:27.265257",
+    "event": "ai_call",
+    "provider": "GitHub Models",
+    "prompt_preview": "\nDesign the architecture for: \"tetris\"\nDescribe (no code yet):\n1. Python libraries to use and why\n2. Classes/modules to create\n3. How the main loop works\n4. Key design decisions\nBe brief \u2014 internal sc",
+    "response_chars": 1549
+  },
+  {
+    "ts": "2026-06-07T23:55:27.273357",
+    "event": "goal_done",
+    "id": "a4f9d868",
+    "title": "DESIGN: architecture"
+  },
+  {
+    "ts": "2026-06-07T23:55:27.278068",
+    "event": "goal_start",
+    "id": "c350bb01",
+    "title": "CODE: write program"
+  },
+  {
+    "ts": "2026-06-07T23:55:34.387489",
+    "event": "ai_call",
+    "provider": "GitHub Models",
+    "prompt_preview": "\nBuild step \"code_core_logic\" for: \"tetris\"\nThis step: Implement the game loop and core mechanics like piece movement and rotation\nOutput ONLY valid Python code. No markdown. No explanation.\nUse pygam",
+    "response_chars": 4910
+  },
+  {
+    "ts": "2026-06-07T23:55:34.390704",
+    "event": "code_written",
+    "step": "code_core_logic",
+    "chars": 4910
+  },
+  {
+    "ts": "2026-06-07T23:55:39.857330",
+    "event": "ai_call",
+    "provider": "GitHub Models",
+    "prompt_preview": "\nYou are building \"tetris\" step by step.\nExisting code so far:\nrid)\n        self.grid = [[(0, 0, 0) for _ in range(COLUMNS)] for _ in range(cleared_lines)] + new_grid\n        return cleared_lines\n\ncla",
+    "response_chars": 4998
+  },
+  {
+    "ts": "2026-06-07T23:55:39.862490",
+    "event": "code_written",
+    "step": "code_piece_handling",
+    "chars": 4998
+  },
+  {
+    "ts": "2026-06-07T23:55:45.694309",
+    "event": "ai_call",
+    "provider": "GitHub Models",
+    "prompt_preview": "\nYou are building \"tetris\" step by step.\nExisting code so far:\n.grid = [[(0, 0, 0) for _ in range(COLUMNS)] for _ in range(cleared_lines)] + new_grid\n        return cleared_lines\n\nclass Game:\n    def ",
+    "response_chars": 4998
+  },
+  {
+    "ts": "2026-06-07T23:55:45.702678",
+    "event": "code_written",
+    "step": "code_collision_detection",
+    "chars": 4998
+  },
+  {
+    "ts": "2026-06-07T23:55:52.250013",
+    "event": "ai_call",
+    "provider": "GitHub Models",
+    "prompt_preview": "\nYou are building \"tetris\" step by step.\nExisting code so far:\n.grid = [[(0, 0, 0) for _ in range(COLUMNS)] for _ in range(cleared_lines)] + new_grid\n        return cleared_lines\n\nclass Game:\n    def ",
+    "response_chars": 5214
+  },
+  {
+    "ts": "2026-06-07T23:55:52.258772",
+    "event": "code_written",
+    "step": "code_line_clearing",
+    "chars": 5214
+  },
+  {
+    "ts": "2026-06-07T23:55:52.657766",
+    "event": "provider_fallback",
+    "from": "GitHub Models",
+    "to": "Groq",
+    "reason": "GitHub Models error: Error code: 413 - {'error': {'code': 'tokens_limit_reached', 'message': 'Request body too large for gpt-4o model. Max si"
+  },
+  {
+    "ts": "2026-06-07T23:55:56.426676",
+    "event": "ai_call",
+    "provider": "Groq",
+    "prompt_preview": "\nYou are building \"tetris\" step by step.\nExisting code so far:\n      return cleared_lines\n\nclass Game:\n    def __init__(self):\n        pygame.init()\n        self.screen = pygame.display.set_mode((SCRE",
+    "response_chars": 6036
+  },
+  {
+    "ts": "2026-06-07T23:55:56.428844",
+    "event": "code_written",
+    "step": "code_scoring_system",
+    "chars": 6036
+  },
+  {
+    "ts": "2026-06-07T23:56:00.443914",
+    "event": "ai_call",
+    "provider": "Groq",
+    "prompt_preview": "\nYou are building \"tetris\" step by step.\nExisting code so far:\nmove(-1, 0)\n        if keys[pygame.K_RIGHT]:\n            if self.board.is_valid_position(self.current_piece, offset_x=1):\n               ",
+    "response_chars": 6562
+  },
+  {
+    "ts": "2026-06-07T23:56:00.446017",
+    "event": "code_written",
+    "step": "code_rendering",
+    "chars": 6548
+  },
+  {
+    "ts": "2026-06-07T23:56:04.934901",
+    "event": "ai_call",
+    "provider": "Groq",
+    "prompt_preview": "\nYou are building \"tetris\" step by step.\nExisting code so far:\n          self.current_piece.rotate()\n                self.current_piece.rotate()\n\n    def update(self):\n        self.drop_time += self.c",
+    "response_chars": 6899
+  },
+  {
+    "ts": "2026-06-07T23:56:04.942382",
+    "event": "code_written",
+    "step": "code_user_input",
+    "chars": 6885
+  },
+  {
+    "ts": "2026-06-07T23:56:04.949569",
+    "event": "goal_done",
+    "id": "c350bb01",
+    "title": "CODE: write program"
+  },
+  {
+    "ts": "2026-06-07T23:56:04.956010",
+    "event": "goal_start",
+    "id": "c5cb7ce7",
+    "title": "TEST+FIX: validate and auto-repair"
+  },
+  {
+    "ts": "2026-06-07T23:56:05.134572",
+    "event": "test_passed",
+    "attempts": 1
+  },
+  {
+    "ts": "2026-06-07T23:56:05.140088",
+    "event": "goal_done",
+    "id": "c5cb7ce7",
+    "title": "TEST+FIX: validate and auto-repair"
+  },
+  {
+    "ts": "2026-06-07T23:56:05.145091",
+    "event": "goal_start",
+    "id": "9b46a038",
+    "title": "LAUNCH: complete and deliver"
+  },
+  {
+    "ts": "2026-06-07T23:56:06.581919",
+    "event": "ai_call",
+    "provider": "Groq",
+    "prompt_preview": "ARIA built: \"tetris\"\nLog:\n\u2713 PLAN: design build roadmap\n\u2713 DESIGN: architecture\n\u21b7 fallback GitHub Models \u2192 Groq\n\u2713 CODE: write program\n\u2b21 tests passed (attempts: 1)\n\u2713 TEST+FIX: validate and auto-repair\nIn",
+    "response_chars": 482
+  },
+  {
+    "ts": "2026-06-07T23:56:06.584536",
+    "event": "task_complete",
+    "task": "tetris",
+    "output": "output/tetris.py",
+    "reflection": "The development of \"tetris\" went well overall, with a clear plan and design leading to a successful coding phase, and the automated testing and validation process ensured that the program was functional and error-free. One area for improvement next time could be to incorporate more advanced features and AI-powered elements, such as predictive piece placement or adaptive difficulty adjustment, to enhance the gameplay experience and make the project more challenging and engaging."
+  },
+  {
+    "ts": "2026-06-07T23:56:08.951455",
+    "event": "goal_done",
+    "id": "9b46a038",
+    "title": "LAUNCH: complete and deliver"
+  }
+]

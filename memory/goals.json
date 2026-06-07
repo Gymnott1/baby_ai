@@ -1,0 +1,26 @@
+[
+  {
+    "id": "19d6fb5e",
+    "title": "self-repair: verify system",
+    "status": "done",
+    "priority": 0,
+    "type": "system",
+    "retries": 0,
+    "history": [
+      {
+        "ts": "2026-06-08T01:36:08.433817",
+        "msg": "system check complete",
+        "data": {}
+      }
+    ]
+  },
+  {
+    "id": "4f6e02ff",
+    "title": "self-repair: verify system",
+    "status": "pending",
+    "priority": 0,
+    "type": "system",
+    "retries": 0,
+    "history": []
+  }
+]

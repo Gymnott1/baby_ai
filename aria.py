@@ -1,1140 +1,1128 @@
 #!/usr/bin/env python3
 """
-ARIA v2 — Autonomous Resident Intelligence Agent (Gemini Edition)
-=================================================================
-Truly autonomous. You give it a task in plain English.
-ARIA plans, codes, tests, fixes, and ships — powered by Google Gemini.
+ARIA v4 — Phi-3 Mini as the local brain
+=========================================
+Phi-3 runs locally and is the intelligence behind everything:
+  - Chat with you naturally
+  - Plan and prioritise goals on boot
+  - Write code to achieve goals
+  - Execute that code and check results
+  - Route to cloud AIs when it needs more power
+  - Learn from every outcome
 
 Usage:
-    python3 aria.py "build a snake game"
-    python3 aria.py "build tetris"
-    python3 aria.py "build a calculator app"
-    python3 aria.py --interactive        ← chat mode
+    python3 aria.py                  ← chat + agent mode
+    python3 aria.py --agent          ← agent only (no chat prompt)
+    python3 aria.py --add-goal "..."  ← inject a goal then run
 
 Requirements:
-    pip install google-genai pygame psutil
-
-Get your FREE API key at:
-    https://aistudio.google.com/app/apikey
-
-Set your key once:
-    export GOOGLE_API_KEY=AIza...
-    (or ARIA will ask you on first run and save it)
+    ollama running with phi3:mini pulled
+    pip install ollama openai psutil
 """
 
-import os, sys, json, time, hashlib, subprocess, ast, textwrap, re, argparse
+import os, sys, json, time, re, ast, subprocess, hashlib, textwrap, argparse, traceback
 from pathlib  import Path
 from datetime import datetime
 
 
-# ═══════════════════════════════════════════════════════════
-#  TERMINAL COLOURS
-# ═══════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════
+#  COLOURS
+# ═══════════════════════════════════════════════
 class C:
-    RESET  = "\033[0m";  BOLD  = "\033[1m"
-    RED    = "\033[91m"; GREEN = "\033[92m"
-    YELLOW = "\033[93m"; CYAN  = "\033[96m"
-    PURPLE = "\033[95m"; GREY  = "\033[90m"
-    WHITE  = "\033[97m"; DIM   = "\033[2m"
+    R="\033[0m"; B="\033[1m"; DIM="\033[2m"
+    GRN="\033[92m"; YLW="\033[93m"; CYN="\033[96m"
+    PRP="\033[95m"; RED="\033[91m"; GRY="\033[90m"
+    WHT="\033[97m"
 
-def ts():
-    return f"{C.GREY}[{datetime.now().strftime('%H:%M:%S')}]{C.RESET}"
-
-def log(level, msg, detail=""):
-    icons = {
-        "BOOT":   f"{C.CYAN}◈{C.RESET}",
-        "GOAL":   f"{C.PURPLE}◆{C.RESET}",
-        "STEP":   f"{C.YELLOW}▸{C.RESET}",
-        "OK":     f"{C.GREEN}✓{C.RESET}",
-        "FAIL":   f"{C.RED}✗{C.RESET}",
-        "FIX":    f"{C.YELLOW}⟳{C.RESET}",
-        "THINK":  f"{C.CYAN}≋{C.RESET}",
-        "DONE":   f"{C.GREEN}★{C.RESET}",
-        "AI":     f"{C.PURPLE}◎{C.RESET}",
-        "TEST":   f"{C.CYAN}⬡{C.RESET}",
-        "WRITE":  f"{C.YELLOW}✎{C.RESET}",
-        "REPAIR": f"{C.RED}⚙{C.RESET}",
-        "WEB":    f"{C.CYAN}↗{C.RESET}",
-    }
-    icon = icons.get(level, "·")
-    line = f"{ts()} {icon} {C.BOLD}{msg}{C.RESET}"
-    if detail:
-        line += f"  {C.DIM}{detail}{C.RESET}"
+def ts(): return f"{C.GRY}[{datetime.now().strftime('%H:%M:%S')}]{C.R}"
+def log(lvl, msg, detail=""):
+    icons = {"BOOT":f"{C.CYN}◈{C.R}","GOAL":f"{C.PRP}◆{C.R}",
+             "STEP":f"{C.YLW}▸{C.R}","OK":f"{C.GRN}✓{C.R}",
+             "FAIL":f"{C.RED}✗{C.R}","FIX":f"{C.YLW}⟳{C.R}",
+             "THINK":f"{C.CYN}≋{C.R}","DONE":f"{C.GRN}★{C.R}",
+             "BRAIN":f"{C.PRP}◎{C.R}","RUN":f"{C.YLW}▶{C.R}",
+             "LEARN":f"{C.GRN}↺{C.R}","CLOUD":f"{C.CYN}↗{C.R}",
+             "CHAT":f"{C.WHT}❯{C.R}"}
+    icon = icons.get(lvl,"·")
+    line = f"{ts()} {icon} {C.B}{msg}{C.R}"
+    if detail: line += f"  {C.DIM}{detail}{C.R}"
     print(line)
 
 
-# ═══════════════════════════════════════════════════════════
-#  SIMPLE KEY STORE  (plaintext for laptop — swap for Vault
-#  from the full ARIA spec when you want encryption)
-# ═══════════════════════════════════════════════════════════
-class KeyStore:
-    def __init__(self, path="output/.aria_config.json"):
-        self.path = Path(path)
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        self._data = json.loads(self.path.read_text()) if self.path.exists() else {}
-
-    def get(self, k, default=None): return self._data.get(k, default)
-    def set(self, k, v):
-        self._data[k] = v
-        self.path.write_text(json.dumps(self._data, indent=2))
-
-
-# ═══════════════════════════════════════════════════════════
-#  HISTORY LEDGER  — append-only log of everything ARIA does
-# ═══════════════════════════════════════════════════════════
-class Ledger:
-    def __init__(self, path="output/history.json"):
-        self.path = Path(path)
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        if not self.path.exists():
-            self.path.write_text("[]")
-
-    def write(self, entry: dict):
-        data = json.loads(self.path.read_text())
-        data.append({"ts": datetime.now().isoformat(), **entry})
-        self.path.write_text(json.dumps(data, indent=2))
-
-    def read(self) -> list:
-        return json.loads(self.path.read_text())
-
-
-# ═══════════════════════════════════════════════════════════
-#  DIFFICULTY SCORER
-# ═══════════════════════════════════════════════════════════
-class DifficultyScorer:
+# ═══════════════════════════════════════════════
+#  MEMORY  — conversation + outcome history
+# ═══════════════════════════════════════════════
+class Memory:
     """
-    Scores a task description across 6 dimensions:
-      sys_req   — compute burden on this machine
-      knowledge — how much domain knowledge needed
-      time      — estimated duration
-      agency    — autonomy + risk level
-      status    — current system health
-      risk      — consequence of failure
+    Two stores:
+      chat_history  — rolling conversation with Phi-3 (last 30 messages)
+      outcome_log   — every goal attempt + result (used for learning)
     """
-    WEIGHTS = dict(sys_req=0.10, knowledge=0.20, time=0.15,
-                   agency=0.25, status=0.10, risk=0.20)
+    def __init__(self, base="memory"):
+        self.base = Path(base)
+        self.base.mkdir(exist_ok=True)
+        self._chat_path    = self.base / "chat.json"
+        self._outcome_path = self.base / "outcomes.json"
+        self._chat:    list = self._load(self._chat_path)
+        self._outcomes:list = self._load(self._outcome_path)
 
-    def score(self, description: str) -> dict:
-        import psutil
-        d = description.lower()
-        cpu = psutil.cpu_percent(interval=0.3) / 100
-        ram = psutil.virtual_memory().percent / 100
+    def _load(self, path) -> list:
+        try: return json.loads(path.read_text())
+        except: return []
 
-        dims = {
-            "sys_req":   min(1.0, (cpu+ram)/2 + (0.2 if "compile" in d else 0)),
-            "knowledge": 0.8 if any(w in d for w in ["game","physics","ai","3d","network"]) else 0.4,
-            "time":      0.9 if any(w in d for w in ["game","full","complete","app"]) else 0.4,
-            "agency":    0.6 if any(w in d for w in ["write","run","execute","install"]) else 0.3,
-            "status":    min(1.0, cpu),
-            "risk":      0.1,
-        }
-        composite = sum(v * self.WEIGHTS[k] for k, v in dims.items())
-        return {"dims": dims, "score": round(composite, 3)}
+    def _save(self, path, data):
+        path.write_text(json.dumps(data, indent=2))
+
+    # ── Chat history ──────────────────────────
+    def add_chat(self, role: str, content: str):
+        self._chat.append({"role": role, "content": content,
+                           "ts": datetime.now().isoformat()})
+        if len(self._chat) > 60:          # keep last 30 exchanges
+            self._chat = self._chat[-60:]
+        self._save(self._chat_path, self._chat)
+
+    def get_chat(self, last_n=20) -> list:
+        """Returns list of {role, content} for Ollama."""
+        return [{"role": m["role"], "content": m["content"]}
+                for m in self._chat[-last_n:]]
+
+    def clear_chat(self):
+        self._chat = []
+        self._save(self._chat_path, self._chat)
+
+    # ── Outcome log ───────────────────────────
+    def log_outcome(self, goal: str, tool: str, success: bool,
+                    result_summary: str, code_written: str = ""):
+        self._outcomes.append({
+            "ts":       datetime.now().isoformat(),
+            "goal":     goal,
+            "tool":     tool,
+            "success":  success,
+            "summary":  result_summary[:300],
+            "had_code": bool(code_written),
+        })
+        self._save(self._outcome_path, self._outcomes)
+
+    def recent_outcomes(self, n=10) -> list:
+        return self._outcomes[-n:]
+
+    def success_rate(self, tool: str) -> float:
+        relevant = [o for o in self._outcomes if o["tool"] == tool]
+        if not relevant: return 0.5   # unknown → neutral
+        return sum(1 for o in relevant if o["success"]) / len(relevant)
 
 
-# ═══════════════════════════════════════════════════════════
-#  GOAL
-# ═══════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════
+#  GOAL  — the atomic unit of work
+# ═══════════════════════════════════════════════
 class Goal:
-    def __init__(self, title, description, priority=50, fn=None):
+    STATUSES = ("pending","active","done","failed","skipped")
+
+    def __init__(self, title, description="", priority=50,
+                 goal_type="autonomous", steps=None):
         self.id          = hashlib.md5(f"{title}{time.time()}".encode()).hexdigest()[:8]
         self.title       = title
-        self.description = description
+        self.description = description or title
         self.priority    = priority
-        self.fn          = fn          # callable that executes this goal
-        self.status      = "pending"   # pending|active|done|failed
-        self.retries     = 0
+        self.goal_type   = goal_type   # autonomous | human_needed | sensor
+        self.status      = "pending"
+        self.steps       = steps or []
         self.history     = []
-        self.result      = None
+        self.result      = {}
+        self.retries     = 0
+        self.code        = ""          # any code Phi-3 wrote for this goal
 
     def log(self, msg, data=None):
         self.history.append({"ts": datetime.now().isoformat(),
-                              "msg": msg, "data": data or {}})
+                             "msg": msg, "data": data or {}})
+
+    def to_dict(self):
+        return {"id":self.id,"title":self.title,"status":self.status,
+                "priority":self.priority,"type":self.goal_type,
+                "retries":self.retries,"history":self.history[-3:]}
 
 
-# ═══════════════════════════════════════════════════════════
-#  PROVIDER REGISTRY
-#  Each provider is tried in order. On 429/quota error,
-#  ARIA automatically falls back to the next one.
-# ═══════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════
+#  GOAL STORE  — persisted to disk
+# ═══════════════════════════════════════════════
+class GoalStore:
+    def __init__(self, path="memory/goals.json"):
+        self.path = Path(path)
+        self.path.parent.mkdir(exist_ok=True)
+        self._goals: list[Goal] = self._load()
 
-class ProviderError(Exception):
-    """Raised when a provider fails and fallback should be tried."""
-    pass
-
-class QuotaError(ProviderError):
-    """Specifically a rate-limit / quota exhaustion."""
-    pass
-
-
-class GeminiProvider:
-    """
-    Google AI Studio — free tier
-    1,500 req/day on gemini-2.0-flash
-    Key format: AIza... or AQ....
-    Get key: https://aistudio.google.com/app/apikey
-    """
-    NAME  = "Google Gemini"
-    MODEL = "gemini-2.0-flash"
-
-    def __init__(self, api_key: str):
-        from google import genai
-        from google.genai import types
-        self._types  = types
-        self.client  = genai.Client(api_key=api_key)
-        self.memory  = []   # {role, content}
-
-    def chat(self, prompt: str, system: str, remember: bool) -> str:
-        contents = []
-        for m in self.memory:
-            contents.append(self._types.Content(
-                role=m["role"],
-                parts=[self._types.Part(text=m["content"])]
-            ))
-        contents.append(self._types.Content(
-            role="user", parts=[self._types.Part(text=prompt)]
-        ))
+    def _load(self) -> list[Goal]:
         try:
-            resp = self.client.models.generate_content(
-                model    = self.MODEL,
-                contents = contents,
-                config   = self._types.GenerateContentConfig(
-                    system_instruction = system,
-                    temperature        = 0.3,
-                    max_output_tokens  = 8192,
-                )
-            )
-            result = resp.text or ""
-        except Exception as e:
-            msg = str(e)
-            if "429" in msg or "RESOURCE_EXHAUSTED" in msg or "quota" in msg.lower():
-                raise QuotaError(f"Gemini quota hit: {msg[:120]}")
-            raise ProviderError(f"Gemini error: {msg[:120]}")
-
-        if remember:
-            self.memory.append({"role": "user",  "content": prompt})
-            self.memory.append({"role": "model", "content": result})
-            if len(self.memory) > 20:
-                self.memory = self.memory[-20:]
-        return result
-
-    @staticmethod
-    def valid_key(k: str) -> bool:
-        return k.startswith("AIza") or k.startswith("AQ.")
-
-
-class GitHubProvider:
-    """
-    GitHub Models — completely free with any GitHub account
-    Runs GPT-4o, Llama, Mistral and more via OpenAI-compatible API
-    Key: your GitHub Personal Access Token (classic or fine-grained)
-    Get key: https://github.com/settings/tokens
-    Docs:    https://docs.github.com/en/github-models
-    """
-    NAME     = "GitHub Models"
-    MODEL    = "gpt-4o"          # also: "meta-llama-3.1-70b-instruct", "mistral-large"
-    BASE_URL = "https://models.inference.ai.azure.com"
-
-    def __init__(self, api_key: str):
-        from openai import OpenAI
-        self.client = OpenAI(api_key=api_key, base_url=self.BASE_URL)
-        self.memory = []   # {role, content}
-
-    def chat(self, prompt: str, system: str, remember: bool) -> str:
-        messages = [{"role": "system", "content": system}]
-        messages += self.memory
-        messages.append({"role": "user", "content": prompt})
-        try:
-            resp = self.client.chat.completions.create(
-                model       = self.MODEL,
-                messages    = messages,
-                temperature = 0.3,
-                max_tokens  = 8192,
-            )
-            result = resp.choices[0].message.content or ""
-        except Exception as e:
-            msg = str(e)
-            if "429" in msg or "rate" in msg.lower() or "quota" in msg.lower():
-                raise QuotaError(f"GitHub Models quota hit: {msg[:120]}")
-            raise ProviderError(f"GitHub Models error: {msg[:120]}")
-
-        if remember:
-            self.memory.append({"role": "user",      "content": prompt})
-            self.memory.append({"role": "assistant", "content": result})
-            if len(self.memory) > 20:
-                self.memory = self.memory[-20:]
-        return result
-
-    @staticmethod
-    def valid_key(k: str) -> bool:
-        # GitHub tokens: classic = ghp_..., fine-grained = github_pat_...
-        return k.startswith("ghp_") or k.startswith("github_pat_") or k.startswith("gh")
-
-
-class GroqProvider:
-    """
-    Groq — extremely fast, generous free tier
-    Runs Llama 3, Mixtral at ~500 tokens/sec
-    Key: https://console.groq.com/keys
-    Free: 14,400 req/day on llama-3.1-70b
-    """
-    NAME  = "Groq"
-    MODEL = "llama-3.3-70b-versatile"
-
-    def __init__(self, api_key: str):
-        from openai import OpenAI
-        self.client = OpenAI(api_key=api_key, base_url="https://api.groq.com/openai/v1")
-        self.memory = []
-
-    def chat(self, prompt: str, system: str, remember: bool) -> str:
-        messages = [{"role": "system", "content": system}]
-        messages += self.memory
-        messages.append({"role": "user", "content": prompt})
-        try:
-            resp = self.client.chat.completions.create(
-                model       = self.MODEL,
-                messages    = messages,
-                temperature = 0.3,
-                max_tokens  = 8192,
-            )
-            result = resp.choices[0].message.content or ""
-        except Exception as e:
-            msg = str(e)
-            if "429" in msg or "rate" in msg.lower():
-                raise QuotaError(f"Groq quota hit: {msg[:120]}")
-            raise ProviderError(f"Groq error: {msg[:120]}")
-
-        if remember:
-            self.memory.append({"role": "user",      "content": prompt})
-            self.memory.append({"role": "assistant", "content": result})
-            if len(self.memory) > 20:
-                self.memory = self.memory[-20:]
-        return result
-
-    @staticmethod
-    def valid_key(k: str) -> bool:
-        return k.startswith("gsk_")
-
-
-# ═══════════════════════════════════════════════════════════
-#  AI BRAIN  — multi-provider with automatic fallback
-#  Priority: Gemini → GitHub Models → Groq
-#  On 429/quota: transparently switches to next provider
-# ═══════════════════════════════════════════════════════════
-class AIBrain:
-    """
-    ARIA's reasoning engine with automatic provider fallback.
-
-    When one provider hits its quota or errors, ARIA instantly
-    switches to the next without losing context or failing the goal.
-
-    Provider priority (configure in KeyStore):
-      1. Google Gemini   — free 1,500 req/day
-      2. GitHub Models   — free with GitHub account (GPT-4o!)
-      3. Groq            — free 14,400 req/day (ultra fast)
-    """
-
-    SYSTEM_PROMPT = (
-        "You are ARIA's internal reasoning engine. You are precise, concise, "
-        "and always output exactly what is asked — no preamble, no explanation "
-        "unless explicitly requested. When asked for code, output ONLY the code, "
-        "never wrapped in markdown fences. When asked for JSON, output ONLY valid JSON."
-    )
-
-    def __init__(self, providers: list, ledger: Ledger):
-        self.providers      = providers   # ordered list of provider instances
-        self.active_idx     = 0           # which provider we're currently on
-        self.ledger         = ledger
-        self.fallback_count = 0
-
-    @property
-    def active(self):
-        return self.providers[self.active_idx]
-
-    def _fallback(self, reason: str):
-        """Switch to the next provider. If all exhausted, reset to first and raise."""
-        old_name = self.active.NAME
-        next_idx = self.active_idx + 1
-        if next_idx >= len(self.providers):
-            self.active_idx = 0   # reset so next goal starts from provider 0
-            raise RuntimeError(
-                f"All {len(self.providers)} providers exhausted.\n"
-                f"  Last error : {reason[:120]}\n"
-                f"  Options    : wait for quota reset, or add more keys with --setup"
-            )
-        self.active_idx = next_idx
-        new_name = self.active.NAME
-        self.fallback_count += 1
-        log("FIX", f"Provider fallback: {old_name} → {new_name}", reason[:80])
-        self.ledger.write({"event": "provider_fallback",
-                           "from": old_name, "to": new_name, "reason": reason})
-        # Copy memory so new provider has full context
-        self.active.memory = list(self.providers[next_idx - 1].memory)
-
-    # ── Core call with automatic retry + fallback ────────────
-    def think(self, prompt: str, system: str = None, remember: bool = False) -> str:
-        sys_prompt = system or self.SYSTEM_PROMPT
-        log("AI", f"[{self.active.NAME}] Thinking...", prompt[:70].replace("\n"," "))
-
-        while True:
-            try:
-                result = self.active.chat(prompt, sys_prompt, remember)
-                self.ledger.write({
-                    "event":          "ai_call",
-                    "provider":       self.active.NAME,
-                    "prompt_preview": prompt[:200],
-                    "response_chars": len(result),
-                })
-                return result
-
-            except QuotaError as e:
-                # Rate limit — switch provider automatically
-                self._fallback(str(e))
-
-            except ProviderError as e:
-                # Other provider error — try fallback once, then raise
-                log("FAIL", f"Provider error: {e}", "trying fallback...")
-                self._fallback(str(e))
-
-    # ── All higher-level methods delegate to think() ─────────
-    def plan_task(self, task: str) -> list[dict]:
-        prompt = f"""
-You are planning how to build: "{task}"
-
-Return a JSON array of build steps. Each step has:
-  "name"        — short identifier (snake_case)
-  "description" — one sentence what this step does
-  "type"        — one of: design | code | test | fix | launch
-
-Return ONLY valid JSON. No markdown. No explanation. Example:
-[
-  {{"name": "design_architecture", "description": "Define classes and game loop structure", "type": "design"}},
-  {{"name": "write_core_logic",    "description": "Write main game classes and mechanics",  "type": "code"}},
-  {{"name": "write_rendering",     "description": "Write all drawing and display code",     "type": "code"}},
-  {{"name": "write_entry_point",   "description": "Write main() and game launch code",      "type": "code"}},
-  {{"name": "test_and_fix",        "description": "Validate syntax and fix any errors",     "type": "test"}},
-  {{"name": "launch",              "description": "Launch the finished program",             "type": "launch"}}
-]
-"""
-        import re, json
-        raw = self.think(prompt)
-        raw = re.sub(r"```[a-z]*\n?", "", raw).strip().rstrip("`")
-        try:
-            return json.loads(raw)
+            data = json.loads(self.path.read_text())
+            goals = []
+            for d in data:
+                g = Goal(d["title"], d.get("description",""),
+                         d.get("priority",50), d.get("type","autonomous"))
+                g.id      = d.get("id", g.id)
+                g.status  = d.get("status","pending")
+                g.retries = d.get("retries", 0)
+                g.history = d.get("history", [])
+                goals.append(g)
+            return goals
         except:
-            log("FIX", "Plan JSON parse failed — using fallback plan")
-            return [
-                {"name": "write_full_program", "description": f"Write complete {task}", "type": "code"},
-                {"name": "test_and_fix",       "description": "Validate and fix",       "type": "test"},
-                {"name": "launch",             "description": "Launch the program",     "type": "launch"},
-            ]
+            return []
 
-    def design(self, task: str) -> str:
-        prompt = f"""
-Design the architecture for: "{task}"
-Describe (no code yet):
-1. Python libraries to use and why
-2. Classes/modules to create
-3. How the main loop works
-4. Key design decisions
-Be brief — internal scratchpad before coding.
-"""
-        result = self.think(prompt, remember=True)
-        log("THINK", "Architecture designed", f"{len(result)} chars")
-        return result
-
-    def write_code(self, task: str, step_name: str, step_desc: str,
-                   existing_code: str = "", error: str = "") -> str:
-        import re
-        if error:
-            prompt = f"""
-The following Python code for "{task}" has an error. Fix it.
-ERROR: {error}
-CURRENT CODE:
-{existing_code}
-Return the COMPLETE fixed Python file. Output ONLY code, no explanation.
-"""
-        elif existing_code:
-            prompt = f"""
-You are building "{task}" step by step.
-Existing code so far:
-{existing_code[-3000:]}
-Now complete step: "{step_name}" — {step_desc}
-Extend the code above. Return the COMPLETE updated Python file.
-Output ONLY valid Python. No markdown fences. No explanation.
-"""
-        else:
-            prompt = f"""
-Build step "{step_name}" for: "{task}"
-This step: {step_desc}
-Output ONLY valid Python code. No markdown. No explanation.
-Use pygame for any game/visual project. Write the foundation that later steps will extend.
-"""
-        code = self.think(prompt, remember=True)
-        code = re.sub(r"^```python\n?", "", code.strip())
-        code = re.sub(r"\n?```$",       "", code.strip())
-        return code.strip()
-
-    def diagnose_error(self, code: str, error: str, task: str) -> str:
-        prompt = f"""
-Building "{task}". Got this error:
-{error}
-Last 50 lines of code:
-{chr(10).join(code.splitlines()[-50:])}
-In ONE sentence: what is wrong and what is the fix?
-"""
-        result = self.think(prompt)
-        log("THINK", f"Diagnosis: {result[:100]}")
-        return result
-
-    def search_for_help(self, query: str) -> str:
-        log("WEB", f"Knowledge lookup: {query[:60]}")
-        result = self.think(
-            f"Technical question for a Python project: {query}\n"
-            f"Give a brief precise answer with code example if relevant."
-        )
-        self.ledger.write({"event": "knowledge_lookup", "query": query})
-        return result
-
-    def reflect(self, task: str, events: list) -> str:
-        # Summarise events as plain text — avoids 413 on large JSON payloads
-        lines = []
-        for e in events[-6:]:
-            ev = e.get("event","?")
-            if ev == "goal_done":   lines.append(f"✓ {e.get('title','')}")
-            elif ev == "goal_failed": lines.append(f"✗ {e.get('title','')} — {e.get('error','')[:60]}")
-            elif ev == "provider_fallback": lines.append(f"↷ fallback {e.get('from')} → {e.get('to')}")
-            elif ev == "test_passed": lines.append(f"⬡ tests passed (attempts: {e.get('attempts',1)})")
-        summary = "\n".join(lines) if lines else "task completed"
-        prompt = (
-            f'ARIA built: "{task}"\n'
-            f'Log:\n{summary}\n'
-            f'In 2 sentences: what went well and one thing to improve next time?'
-        )
-        return self.think(prompt)
-
-
-# ═══════════════════════════════════════════════════════════
-#  CODE EXECUTOR  — runs/tests generated code safely
-# ═══════════════════════════════════════════════════════════
-class CodeExecutor:
-    def __init__(self, output_dir="output"):
-        self.output_dir = Path(output_dir)
-        self.output_dir.mkdir(exist_ok=True)
-
-    def save(self, filename: str, code: str) -> Path:
-        path = self.output_dir / filename
-        path.write_text(code)
-        return path
-
-    def syntax_check(self, code: str) -> tuple[bool, str]:
-        """Parse the code with Python's AST — catches all syntax errors."""
-        try:
-            ast.parse(code)
-            return True, ""
-        except SyntaxError as e:
-            return False, f"SyntaxError line {e.lineno}: {e.msg}\n  → {e.text}"
-
-    def structure_check(self, code: str, required_names: list) -> tuple[bool, str]:
-        """Verify expected classes/functions exist in the code."""
-        try:
-            tree  = ast.parse(code)
-            found = {n.name for n in ast.walk(tree)
-                     if isinstance(n, (ast.ClassDef, ast.FunctionDef))}
-            missing = [r for r in required_names if r not in found]
-            if missing:
-                return False, f"Missing definitions: {missing}"
-            return True, ""
-        except:
-            return True, ""   # If we can't parse, syntax_check will catch it
-
-    def runtime_check(self, path: Path, timeout: int = 5) -> tuple[bool, str]:
-        """
-        Try running the script in a subprocess with a display env variable
-        set to suppress pygame window during testing.
-        Captures output and errors within timeout.
-        """
-        env = os.environ.copy()
-        env["ARIA_TEST_MODE"] = "1"
-        env["SDL_VIDEODRIVER"] = "dummy"    # pygame: no window during test
-        env["SDL_AUDIODRIVER"] = "dummy"    # pygame: no audio during test
-
-        # We wrap the script: import it, but __name__ won't be '__main__'
-        # so the game loop won't start. This catches import-time errors.
-        test_code = f"""
-import sys
-sys.path.insert(0, '{path.parent}')
-try:
-    import importlib.util
-    spec = importlib.util.spec_from_file_location('_aria_test', '{path}')
-    mod  = importlib.util.module_from_spec(spec)
-    # Don't exec — just verify it loads without error at module level
-    import ast, py_compile
-    py_compile.compile('{path}', doraise=True)
-    print('RUNTIME_OK')
-except Exception as e:
-    print(f'RUNTIME_ERROR: {{e}}')
-"""
-        result = subprocess.run(
-            [sys.executable, "-c", test_code],
-            capture_output=True, text=True,
-            timeout=timeout, env=env
-        )
-        output = result.stdout + result.stderr
-        if "RUNTIME_OK" in output:
-            return True, ""
-        error = output.replace("RUNTIME_ERROR: ", "").strip()
-        return False, error or "Unknown runtime error"
-
-    def launch(self, path: Path):
-        """Open the finished program in a new process."""
-        log("DONE", f"Launching: {path.name}")
-        subprocess.Popen([sys.executable, str(path)])
-
-
-# ═══════════════════════════════════════════════════════════
-#  BRAIN — Goal Queue + Execution Engine
-# ═══════════════════════════════════════════════════════════
-class Brain:
-    def __init__(self, ledger: Ledger, ai: AIBrain, executor: CodeExecutor):
-        self.ledger   = ledger
-        self.ai       = ai
-        self.executor = executor
-        self.scorer   = DifficultyScorer()
-        self._queue   = []
+    def _save(self):
+        self.path.write_text(json.dumps(
+            [g.to_dict() for g in self._goals], indent=2))
 
     def add(self, goal: Goal):
-        diff = self.scorer.score(goal.description)
-        goal.priority += int(diff["score"] * 20)
-        self._queue.sort(key=lambda g: g.priority)
-        self._queue.append(goal)
-        self._queue.sort(key=lambda g: g.priority)
-        self.ledger.write({"event": "goal_queued", "title": goal.title,
-                           "priority": goal.priority, "difficulty": diff["score"]})
-        log("GOAL", f"Queued: {goal.title}",
-            f"priority={goal.priority} diff={diff['score']:.2f}")
+        self._goals.append(goal)
+        self._sort()
+        self._save()
+
+    def pending(self) -> list[Goal]:
+        self._sort()
+        return [g for g in self._goals if g.status == "pending"]
+
+    def all(self) -> list[Goal]:
+        return self._goals
+
+    def _sort(self):
+        self._goals.sort(key=lambda g: g.priority)
+
+    def update(self, goal: Goal):
+        for i, g in enumerate(self._goals):
+            if g.id == goal.id:
+                self._goals[i] = goal
+                break
+        self._save()
+
+    def clear_done(self):
+        self._goals = [g for g in self._goals
+                       if g.status not in ("done","skipped")]
+        self._save()
+
+
+# ═══════════════════════════════════════════════
+#  TOOL EXECUTOR  — every tool has a fallback chain
+# ═══════════════════════════════════════════════
+class ToolExecutor:
+    """
+    Tools ARIA can use. Each has a fallback list.
+    Phi-3 decides which tool to call; this class runs it
+    and falls back automatically on failure.
+    """
+
+    FALLBACKS = {
+        "ai_code":   ["cloud_ai",  "local_phi3", "skip"],
+        "ai_reason": ["local_phi3","cloud_ai",   "skip"],
+        "search":    ["duckduckgo","wikipedia",   "local_cache", "skip"],
+        "run_code":  ["subprocess","python_exec", "log_and_skip"],
+        "file":      ["direct",    "copy_tmp",    "skip"],
+        "notify":    ["telegram",  "local_log"],
+        "shell":     ["subprocess","log_and_skip"],
+    }
+
+    def __init__(self, phi3: 'Phi3Brain', cloud: 'CloudRouter', memory: Memory):
+        self.phi3   = phi3
+        self.cloud  = cloud
+        self.memory = memory
+        self._cache = {}   # local search cache
+
+    def run(self, tool: str, **kwargs) -> dict:
+        """Run a tool with automatic fallback. Always returns {ok, result, tool_used}."""
+        chain = self.FALLBACKS.get(tool, [tool, "skip"])
+        last_error = ""
+
+        for candidate in chain:
+            try:
+                result = self._run_one(candidate, **kwargs)
+                self.memory.log_outcome(
+                    kwargs.get("goal","?"), candidate, True, str(result)[:200])
+                return {"ok": True, "result": result, "tool_used": candidate}
+            except Exception as e:
+                last_error = str(e)
+                log("FIX", f"Tool '{candidate}' failed → trying fallback",
+                    last_error[:60])
+                self.memory.log_outcome(
+                    kwargs.get("goal","?"), candidate, False, last_error[:200])
+                continue
+
+        return {"ok": False, "result": last_error, "tool_used": "none"}
+
+    def _run_one(self, tool: str, **kwargs) -> str:
+        # ── AI tools ─────────────────────────────
+        if tool == "cloud_ai":
+            prompt = kwargs.get("prompt","")
+            return self.cloud.ask(prompt)
+
+        if tool == "local_phi3":
+            prompt = kwargs.get("prompt","")
+            return self.phi3.ask(prompt)
+
+        # ── Code execution ────────────────────────
+        if tool == "subprocess":
+            code    = kwargs.get("code","")
+            timeout = kwargs.get("timeout", 30)
+            path    = Path("output") / f"_run_{int(time.time())}.py"
+            path.write_text(code)
+            env = os.environ.copy()
+            env["SDL_VIDEODRIVER"] = "dummy"
+            env["SDL_AUDIODRIVER"] = "dummy"
+            r = subprocess.run(
+                [sys.executable, str(path)],
+                capture_output=True, text=True,
+                timeout=timeout, env=env
+            )
+            path.unlink(missing_ok=True)
+            if r.returncode != 0:
+                raise RuntimeError(r.stderr[:300])
+            return r.stdout[:500] or "ran ok"
+
+        if tool == "python_exec":
+            # Safe eval of simple expressions
+            code = kwargs.get("code","")
+            try:
+                result = eval(compile(code, "<aria>", "exec"))
+                return str(result)
+            except:
+                exec(code, {})
+                return "exec ok"
+
+        if tool == "log_and_skip":
+            log("FIX", "Skipping — logging instead")
+            return "skipped — logged"
+
+        # ── Search ────────────────────────────────
+        if tool == "duckduckgo":
+            query = kwargs.get("query","")
+            q = query.replace(" ", "+")
+            try:
+                import urllib.request
+                url = f"https://api.duckduckgo.com/?q={q}&format=json&no_html=1"
+                with urllib.request.urlopen(url, timeout=10) as resp:
+                    import json as _json
+                    d = _json.loads(resp.read())
+                    result2 = d.get("AbstractText","") or d.get("Answer","")
+                    if not result2:
+                        raise RuntimeError("no result")
+                    self._cache[query] = result2
+                    return result2[:400]
+            except Exception as ex:
+                raise RuntimeError(f"duckduckgo: {ex}")
+
+        if tool == "wikipedia":
+            query = kwargs.get("query","").replace(" ","_")
+            r = subprocess.run(
+                ["python3","-c",
+                 f"import urllib.request; "
+                 f"u='https://en.wikipedia.org/api/rest_v1/page/summary/{query}'; "
+                 f"r=urllib.request.urlopen(u); "
+                 f"import json; d=json.loads(r.read()); "
+                 f"print(d.get('extract','')[:400])"],
+                capture_output=True, text=True, timeout=10
+            )
+            result = r.stdout.strip()
+            if result:
+                self._cache[query] = result
+                return result
+            raise RuntimeError("no wikipedia result")
+
+        if tool == "local_cache":
+            query = kwargs.get("query","")
+            cached = self._cache.get(query)
+            if cached: return cached
+            raise RuntimeError("not in cache")
+
+        # ── File ─────────────────────────────────
+        if tool == "direct":
+            path = kwargs.get("path","")
+            return Path(path).read_text()
+
+        if tool == "copy_tmp":
+            path = kwargs.get("path","")
+            import shutil
+            tmp = Path("/tmp") / Path(path).name
+            shutil.copy2(path, tmp)
+            return tmp.read_text()
+
+        # ── Notify ────────────────────────────────
+        if tool == "telegram":
+            token   = os.environ.get("TELEGRAM_BOT_TOKEN","")
+            chat_id = os.environ.get("TELEGRAM_CHAT_ID","")
+            if not token or not chat_id:
+                raise RuntimeError("no telegram config")
+            import urllib.request
+            msg = kwargs.get("message","ARIA notification")
+            url = f"https://api.telegram.org/bot{token}/sendMessage"
+            data = json.dumps({"chat_id":chat_id,"text":msg}).encode()
+            req  = urllib.request.Request(url, data=data,
+                   headers={"Content-Type":"application/json"})
+            urllib.request.urlopen(req, timeout=10)
+            return "telegram sent"
+
+        if tool == "local_log":
+            msg  = kwargs.get("message","ARIA notification")
+            path = Path("logs/notifications.log")
+            path.parent.mkdir(exist_ok=True)
+            with open(path,"a") as f:
+                f.write(f"[{datetime.now().isoformat()}] {msg}\n")
+            return "logged"
+
+        # ── Shell ─────────────────────────────────
+        if tool == "shell":
+            cmd = kwargs.get("cmd","")
+            r   = subprocess.run(cmd, shell=True, capture_output=True,
+                                 text=True, timeout=30)
+            if r.returncode != 0:
+                raise RuntimeError(r.stderr[:200])
+            return r.stdout[:500]
+
+        if tool == "skip":
+            return "skipped"
+
+        raise RuntimeError(f"unknown tool: {tool}")
+
+
+# ═══════════════════════════════════════════════
+#  CLOUD ROUTER  — fallback when Phi-3 needs help
+# ═══════════════════════════════════════════════
+class CloudRouter:
+    """
+    Cloud AIs are tools, not the brain.
+    Phi-3 calls them when a task is beyond its ability
+    (e.g. writing 500 lines of complex code).
+    Fallback: GitHub Models → Groq → skip
+    """
+
+    def __init__(self):
+        self._providers = []
+        self._setup()
+
+    def _setup(self):
+        store_path = Path("memory/.keys.json")
+        keys = {}
+        try: keys = json.loads(store_path.read_text())
+        except: pass
+
+        # GitHub Models (GPT-4o) — free
+        gh = os.environ.get("GITHUB_TOKEN","") or keys.get("github_token","")
+        if gh:
+            try:
+                from openai import OpenAI
+                client = OpenAI(api_key=gh,
+                    base_url="https://models.inference.ai.azure.com")
+                self._providers.append(("GitHub/GPT-4o", client, "gpt-4o"))
+                log("OK", "Cloud: GitHub Models ready")
+            except: pass
+
+        # Groq — free, fast
+        gq = os.environ.get("GROQ_API_KEY","") or keys.get("groq_api_key","")
+        if gq:
+            try:
+                from openai import OpenAI
+                client = OpenAI(api_key=gq,
+                    base_url="https://api.groq.com/openai/v1")
+                self._providers.append(("Groq/Llama", client, "llama-3.3-70b-versatile"))
+                log("OK", "Cloud: Groq ready")
+            except: pass
+
+        # Google Gemini
+        gm = os.environ.get("GOOGLE_API_KEY","") or keys.get("google_api_key","")
+        if gm:
+            try:
+                from google import genai
+                from google.genai import types
+                self._gem_client = genai.Client(api_key=gm)
+                self._gem_types  = types
+                self._providers.append(("Gemini", None, "gemini-2.0-flash"))
+                log("OK", "Cloud: Gemini ready")
+            except: pass
+
+        if not self._providers:
+            log("FIX", "No cloud providers found — Phi-3 works alone")
+
+    def ask(self, prompt: str, system: str = None) -> str:
+        sys_msg = system or (
+            "You are a powerful AI assistant helping ARIA complete goals. "
+            "Be precise. When asked for code output ONLY code, no explanation."
+        )
+        for name, client, model in self._providers:
+            try:
+                log("CLOUD", f"Calling {name}...", prompt[:60].replace("\n"," "))
+                if name == "Gemini":
+                    resp = self._gem_client.models.generate_content(
+                        model=model,
+                        contents=[self._gem_types.Content(
+                            role="user",
+                            parts=[self._gem_types.Part(text=prompt)]
+                        )],
+                        config=self._gem_types.GenerateContentConfig(
+                            system_instruction=sys_msg,
+                            temperature=0.3, max_output_tokens=8192)
+                    )
+                    return resp.text or ""
+                else:
+                    resp = client.chat.completions.create(
+                        model=model, temperature=0.3, max_tokens=8192,
+                        messages=[{"role":"system","content":sys_msg},
+                                  {"role":"user",  "content":prompt}]
+                    )
+                    return resp.choices[0].message.content or ""
+            except Exception as e:
+                msg = str(e)
+                if "429" in msg or "quota" in msg.lower() or "rate" in msg.lower():
+                    log("FIX", f"{name} quota hit → next provider")
+                else:
+                    log("FIX", f"{name} error → next provider", msg[:60])
+                continue
+        raise RuntimeError("All cloud providers unavailable")
+
+    def available(self) -> bool:
+        return len(self._providers) > 0
+
+
+# ═══════════════════════════════════════════════
+#  PHI-3 BRAIN  — the local intelligence
+# ═══════════════════════════════════════════════
+class Phi3Brain:
+    """
+    Phi-3 Mini running via Ollama.
+    This is ARIA's permanent local brain.
+    It plans, routes, writes small code, checks results,
+    and holds conversations. It uses cloud AIs as tools
+    when a task is too large for it.
+    """
+
+    MODEL   = "phi3:mini"
+    PERSONA = """You are ARIA — an Autonomous Resident Intelligence Agent.
+You live on this laptop. You are intelligent, concise, and goal-driven.
+You have access to tools: cloud_ai, search, run_code, shell, file, notify.
+You remember past conversations and learn from outcomes.
+When asked to do something, you think step by step.
+When writing code, you write complete working Python.
+You are honest about what you can and cannot do.
+Keep responses concise unless detail is needed."""
+
+    def __init__(self):
+        import ollama as _ollama
+        self._ollama = _ollama
+        self._verify()
+
+    def _verify(self):
+        try:
+            self._ollama.chat(model=self.MODEL,
+                messages=[{"role":"user","content":"reply: READY"}])
+            log("OK", f"Phi-3 Mini online")
+        except Exception as e:
+            log("FAIL", f"Phi-3 not responding: {e}")
+            log("FIX",  "Start Ollama with: ollama serve  (in a separate terminal)")
+            sys.exit(1)
+
+    def ask(self, prompt: str, history: list = None,
+            system: str = None) -> str:
+        """Raw call to Phi-3. Returns text."""
+        messages = []
+        if history:
+            messages = list(history)
+        messages.append({"role":"user","content":prompt})
+
+        resp = self._ollama.chat(
+            model   = self.MODEL,
+            messages= messages,
+            options = {"temperature": 0.4, "num_ctx": 4096},
+            stream  = False
+        )
+        return resp["message"]["content"].strip()
+
+    def ask_stream(self, prompt: str, history: list = None,
+                   system: str = None):
+        """Streaming call — yields text chunks for live display."""
+        messages = []
+        if history:
+            messages = list(history)
+        messages.append({"role":"user","content":prompt})
+
+        for chunk in self._ollama.chat(
+            model   = self.MODEL,
+            messages= messages,
+            options = {"temperature": 0.5, "num_ctx": 4096},
+            stream  = True
+        ):
+            yield chunk["message"]["content"]
+
+    def plan_goal(self, goal_title: str, available_tools: list,
+                  past_outcomes: list) -> dict:
+        """
+        Short, fast prompt — Phi-3 responds in seconds not minutes.
+        """
+        # Build a one-line history hint
+        hint = ""
+        if past_outcomes:
+            last = past_outcomes[-1]
+            hint = f" (last: {last['tool']} {'ok' if last['success'] else 'fail'})"
+
+        prompt = (
+            f'Goal: "{goal_title}"{hint}\n'
+            f'Tools: {", ".join(available_tools[:4])}\n'
+            f'Reply JSON only, no explanation:\n'
+            f'{{"needs_code":true/false,"primary_tool":"name","fallback_tool":"name",'
+            f'"approach":"one sentence","needs_cloud":true/false}}'
+        )
+
+        raw = self.ask(prompt)
+        try:
+            # Extract JSON even if Phi-3 adds surrounding text
+            match = re.search(r'\{.*\}', raw, re.DOTALL)
+            if match:
+                return json.loads(match.group())
+        except:
+            pass
+        # Fallback plan if JSON parsing fails
+        return {
+            "needs_code":    False,
+            "primary_tool":  "cloud_ai" if available_tools else "skip",
+            "fallback_tool": "local_phi3",
+            "approach":      f"attempt goal directly",
+            "steps":         [goal_title],
+            "needs_cloud":   True,
+            "reason":        "default plan"
+        }
+
+    def write_code(self, task: str, context: str = "",
+                   cloud: 'CloudRouter' = None) -> str:
+        """
+        Phi-3 writes code for a task.
+        If the task is complex, it delegates to cloud AI
+        and then reviews the result.
+        """
+        # Estimate complexity: if task mentions game/full app → use cloud
+        complex_keywords = ["game","tetris","snake","full","complete",
+                            "app","pygame","gui","database"]
+        is_complex = any(k in task.lower() for k in complex_keywords)
+
+        if is_complex and cloud and cloud.available():
+            log("THINK", "Complex code task → delegating to cloud AI")
+            prompt = f"""Write complete Python code for: {task}
+{('Context: ' + context) if context else ''}
+Output ONLY the Python code. No explanation. No markdown fences."""
+            code = cloud.ask(prompt)
+        else:
+            log("THINK", f"Phi-3 writing code for: {task[:60]}")
+            prompt = f"""Write Python code for: {task}
+{('Context: ' + context) if context else ''}
+Output ONLY working Python code. No explanation."""
+            code = self.ask(prompt)
+
+        # Strip markdown fences if present
+        code = re.sub(r'^```python\n?', '', code.strip())
+        code = re.sub(r'\n?```$',       '', code.strip())
+        return code.strip()
+
+    def check_result(self, goal: str, result: str) -> dict:
+        """
+        Quick success check — short prompt for fast response.
+        Falls back to heuristic if Phi-3 is slow.
+        """
+        # Heuristic first — fast and good enough for most cases
+        result_lower = result.lower()
+        error_words  = ["error","traceback","exception","failed","no result",
+                        "not found","refused","denied"]
+        ok_words     = ["ok","success","done","complete","ran ok","wrote","created"]
+
+        auto_fail = any(w in result_lower for w in error_words)
+        auto_ok   = any(w in result_lower for w in ok_words)
+
+        if auto_fail and not auto_ok:
+            return {"success": False, "confidence": 0.8, "notes": "error detected"}
+        if auto_ok and not auto_fail:
+            return {"success": True,  "confidence": 0.8, "notes": "success detected"}
+
+        # Ambiguous — ask Phi-3 briefly
+        prompt = (
+            f'Goal: "{goal[:60]}"\n'
+            f'Result: "{result[:120]}"\n'
+            f'Reply JSON: {{"success":true/false,"confidence":0.0-1.0,"notes":"reason"}}'
+        )
+        try:
+            raw = self.ask(prompt)
+            match = re.search(r'\{.*\}', raw, re.DOTALL)
+            if match:
+                return json.loads(match.group())
+        except:
+            pass
+        return {"success": not auto_fail, "confidence": 0.5, "notes": "heuristic"}
+
+    def generate_subgoals(self, main_goal: str) -> list[str]:
+        """Break a big goal into smaller sub-goals."""
+        prompt = f"""Break this goal into 3-5 concrete sub-goals:
+"{main_goal}"
+Reply ONLY with a JSON array of strings:
+["sub-goal 1", "sub-goal 2", "sub-goal 3"]"""
+
+        raw = self.ask(prompt)
+        try:
+            match = re.search(r'\[.*\]', raw, re.DOTALL)
+            if match:
+                return json.loads(match.group())
+        except:
+            pass
+        return [main_goal]
+
+
+# ═══════════════════════════════════════════════
+#  AGENT  — the execution engine
+# ═══════════════════════════════════════════════
+class Agent:
+    """
+    Runs the goal queue. For each goal:
+      1. Phi-3 plans the approach
+      2. Phi-3 writes code if needed
+      3. ToolExecutor runs with fallbacks
+      4. Phi-3 checks the result
+      5. Outcome logged → learning
+    """
+
+    AVAILABLE_TOOLS = ["cloud_ai","local_phi3","search",
+                       "run_code","shell","file","notify"]
+
+    def __init__(self, brain: Phi3Brain, cloud: CloudRouter,
+                 memory: Memory, store: GoalStore):
+        self.brain   = brain
+        self.cloud   = cloud
+        self.memory  = memory
+        self.store   = store
+        self.tools   = ToolExecutor(brain, cloud, memory)
 
     def run_all(self):
-        while True:
-            pending = [g for g in self._queue if g.status == "pending"]
-            if not pending:
-                break
-            goal = pending[0]
-            self._execute(goal)
+        """Process all pending goals in priority order."""
+        pending = self.store.pending()
+        if not pending:
+            log("DONE", "No pending goals.")
+            return
 
-    def _execute(self, goal: Goal):
+        log("BOOT", f"{len(pending)} goal(s) to process")
+        for goal in pending:
+            self._run_goal(goal)
+
+    def _run_goal(self, goal: Goal):
         goal.status = "active"
-        log("GOAL", f"Executing: {goal.title}")
-        self.ledger.write({"event": "goal_start", "id": goal.id, "title": goal.title})
+        self.store.update(goal)
+        log("GOAL", f"Working on: {goal.title}")
+
+        # Fast path: system goals run concrete checks, no Phi-3 needed
+        if goal.goal_type == "system":
+            ok = self_repair()
+            goal.status = "done" if ok else "failed"
+            goal.result = {"ok": ok}
+            goal.log("system check complete")
+            self.store.update(goal)
+            log("OK" if ok else "FAIL", "System check complete")
+            return
+
         try:
-            goal.result = goal.fn()
-            goal.status = "done"
-            goal.log("success")
-            self.ledger.write({"event": "goal_done", "id": goal.id, "title": goal.title})
-            log("OK", f"Done: {goal.title}")
+            # ── 1. Phi-3 plans ──────────────────
+            log("THINK", "Phi-3 planning approach...")
+            plan = self.brain.plan_goal(
+                goal.title,
+                self.AVAILABLE_TOOLS,
+                self.memory.recent_outcomes(5)
+            )
+            log("STEP", f"Plan: {plan.get('approach','?')}",
+                f"tool={plan.get('primary_tool')} cloud={plan.get('needs_cloud')}")
+            goal.log("planned", plan)
+
+            # ── 2. Write code if needed ─────────
+            code_result = ""
+            if plan.get("needs_code"):
+                log("THINK", "Phi-3 writing code...")
+                context = "\n".join(plan.get("steps",[]))
+                code = self.brain.write_code(
+                    goal.title, context,
+                    cloud=self.cloud if plan.get("needs_cloud") else None
+                )
+                goal.code = code
+
+                # Save the code
+                filename  = re.sub(r'[^a-z0-9]+','_', goal.title.lower())[:30]
+                code_path = Path("output") / f"{filename}.py"
+                code_path.write_text(code)
+                log("OK", f"Code written → {code_path.name}",
+                    f"{len(code.splitlines())} lines")
+
+                # Validate syntax
+                ok, err = self._syntax_check(code)
+                if not ok:
+                    log("FIX", "Syntax error — asking Phi-3 to fix...")
+                    fix_prompt = f"""Fix this Python syntax error:
+Error: {err}
+Code:
+{code}
+Output ONLY the fixed Python code."""
+                    code = self.brain.ask(fix_prompt)
+                    code = re.sub(r'^```python\n?','',code.strip())
+                    code = re.sub(r'\n?```$','',code.strip())
+                    code_path.write_text(code)
+                    goal.code = code
+
+                # Run it
+                log("RUN", f"Running {code_path.name}...")
+                run_result = self.tools.run("run_code",
+                    code=code, goal=goal.title, timeout=15)
+                code_result = run_result.get("result","")
+                if run_result["ok"]:
+                    log("OK", "Code ran successfully", code_result[:60])
+                else:
+                    log("FIX", "Code error — asking Phi-3 to diagnose...",
+                        code_result[:60])
+                    # One auto-fix attempt
+                    fix_prompt = f"""Fix this Python error:
+Error: {code_result}
+Code:
+{code}
+Output ONLY the fixed Python code."""
+                    fixed_code = self.brain.ask(fix_prompt)
+                    fixed_code = re.sub(r'^```python\n?','',fixed_code.strip())
+                    fixed_code = re.sub(r'\n?```$','',fixed_code.strip())
+                    code_path.write_text(fixed_code)
+                    goal.code = fixed_code
+                    retry = self.tools.run("run_code",
+                        code=fixed_code, goal=goal.title, timeout=15)
+                    code_result = retry.get("result","")
+                    if retry["ok"]:
+                        log("OK", "Fixed and ran successfully")
+                    else:
+                        log("FIX","Still failing — continuing anyway",
+                            code_result[:40])
+
+            else:
+                # ── 3. Use a tool directly ───────
+                primary = plan.get("primary_tool","cloud_ai")
+                prompt  = f"Complete this goal: {goal.title}\n{goal.description}"
+
+                if primary in ("cloud_ai","local_phi3"):
+                    result = self.tools.run("ai_reason",
+                        prompt=prompt, goal=goal.title)
+                else:
+                    result = self.tools.run(primary,
+                        prompt=prompt, goal=goal.title)
+
+                code_result = result.get("result","")
+                log("OK" if result["ok"] else "FIX",
+                    f"Tool result via {result['tool_used']}",
+                    code_result[:80])
+
+            # ── 4. Phi-3 checks result ──────────
+            log("THINK", "Phi-3 reviewing result...")
+            check = self.brain.check_result(goal.title, code_result)
+            success = check.get("success", True)
+            log("OK" if success else "FAIL",
+                f"Result: {'success' if success else 'partial'}",
+                f"confidence={check.get('confidence',0):.0%} — {check.get('notes','')[:60]}")
+
+            # ── 5. Done ──────────────────────────
+            goal.status = "done" if success else "failed"
+            goal.result = {"output": code_result[:500], "check": check}
+            goal.log("completed", check)
+            self.store.update(goal)
+
+            self.memory.log_outcome(
+                goal.title,
+                plan.get("primary_tool","?"),
+                success,
+                code_result[:200],
+                goal.code
+            )
+
+            # Learn: if goal produced working code → save as example
+            if success and goal.code:
+                self._save_example(goal)
+
         except Exception as e:
             goal.status = "failed"
             goal.retries += 1
             goal.log(f"error: {e}")
-            log("FAIL", f"Failed: {goal.title}", str(e)[:100])
-            self.ledger.write({"event": "goal_failed", "id": goal.id, "error": str(e)})
+            self.store.update(goal)
+            log("FAIL", f"Goal failed: {e}", traceback.format_exc()[-200:])
+
             if goal.retries <= 2:
-                log("FIX", f"Auto-retrying (attempt {goal.retries}/2)...")
-                time.sleep(0.5)
+                log("FIX", f"Retrying goal (attempt {goal.retries}/2)...")
                 goal.status = "pending"
-                self._execute(goal)
+                self.store.update(goal)
+
+    def _syntax_check(self, code: str) -> tuple[bool, str]:
+        try:
+            ast.parse(code)
+            return True, ""
+        except SyntaxError as e:
+            return False, f"line {e.lineno}: {e.msg}"
+
+    def _save_example(self, goal: Goal):
+        """Save successful code as a training example for future reference."""
+        ex_dir = Path("memory/examples")
+        ex_dir.mkdir(exist_ok=True)
+        name = re.sub(r'[^a-z0-9]+','_', goal.title.lower())[:30]
+        (ex_dir / f"{name}.py").write_text(goal.code)
+        log("LEARN", f"Saved example: {name}.py")
 
 
-# ═══════════════════════════════════════════════════════════
-#  SELF-REPAIR  — always goal #0
-# ═══════════════════════════════════════════════════════════
-class SelfRepair:
-    REQUIRED_PACKAGES = ["google-genai", "pygame", "psutil"]
+# ═══════════════════════════════════════════════
+#  CHAT MODE  — talk to Phi-3 directly
+# ═══════════════════════════════════════════════
+class Chat:
+    """
+    Natural conversation with Phi-3.
+    Phi-3 remembers the conversation and can:
+      - answer questions
+      - add goals ("add goal: build tetris")
+      - show goal queue ("goals")
+      - clear memory ("forget")
+      - run agent ("run goals")
+    """
 
-    def run(self) -> bool:
-        log("REPAIR", "Self-repair: checking system...")
-        ok = True
+    COMMANDS = {
+        "goals":      "show current goal queue",
+        "run goals":  "execute all pending goals now",
+        "clear done": "remove completed goals",
+        "forget":     "clear conversation memory",
+        "help":       "show this help",
+        "quit":       "exit ARIA",
+    }
 
-        if sys.version_info < (3, 10):
-            log("FAIL", f"Python 3.10+ required, got {sys.version[:6]}")
-            ok = False
+    def __init__(self, brain: Phi3Brain, agent: Agent,
+                 store: GoalStore, memory: Memory):
+        self.brain  = brain
+        self.agent  = agent
+        self.store  = store
+        self.memory = memory
 
-        for pkg in self.REQUIRED_PACKAGES:
-            try:
-                __import__(pkg.replace("-", "_"))
-                log("OK", f"Package present: {pkg}")
-            except ImportError:
-                log("FIX", f"Auto-installing: {pkg}")
-                r = subprocess.run(
-                    [sys.executable, "-m", "pip", "install", pkg, "-q"],
-                    capture_output=True
-                )
-                if r.returncode != 0:
-                    log("FAIL", f"Could not install {pkg}")
-                    ok = False
-
-        Path("output").mkdir(exist_ok=True)
-        Path("logs").mkdir(exist_ok=True)
-        return ok
-
-
-# ═══════════════════════════════════════════════════════════
-#  ARIA  — The Agent
-#  This is what orchestrates everything
-# ═══════════════════════════════════════════════════════════
-class ARIA:
-    VERSION = "3.0"
-
-    def __init__(self, providers: list):
-        self.ledger   = Ledger()
-        self.store    = KeyStore()
-        self.repair   = SelfRepair()
-        self.executor = CodeExecutor()
-        self.ai       = AIBrain(providers, self.ledger)
-        self.brain    = Brain(self.ledger, self.ai, self.executor)
-        self.ledger.write({"event": "aria_boot", "version": "3.0",
-                           "providers": [p.NAME for p in providers]})
-
-    # ── Main entry: give ARIA a task ─────────────────────────
-    def run_task(self, task: str):
-        self._print_banner(task)
-
-        # ── Goal 0: Self-repair (always first) ──────────────
-        def do_repair():
-            ok = self.repair.run()
-            if not ok:
-                raise RuntimeError("System not healthy — check errors above")
-
-        self.brain.add(Goal(
-            title="SELF-REPAIR: system integrity check",
-            description="Verify Python version, packages, and write permissions",
-            priority=0,
-            fn=do_repair
-        ))
-
-        # ── Goal 1: Plan the task ────────────────────────────
-        plan_result = []
-
-        def do_plan():
-            log("THINK", f"Planning task: {task}")
-            steps = self.ai.plan_task(task)
-            plan_result.extend(steps)
-            log("OK", f"Plan: {len(steps)} steps")
-            for i, s in enumerate(steps):
-                log("STEP", f"  {i+1}. [{s['type']}] {s['name']}", s['description'])
-            self.ledger.write({"event": "plan_created", "task": task, "steps": steps})
-
-        self.brain.add(Goal(
-            title="PLAN: design build roadmap",
-            description=f"Ask AI to plan how to build: {task}",
-            priority=5,
-            fn=do_plan
-        ))
-
-        # ── Goal 2: Architecture design ─────────────────────
-        design_result = []
-
-        def do_design():
-            log("THINK", "Designing architecture...")
-            design = self.ai.design(task)
-            design_result.append(design)
-            print(f"\n{C.DIM}  {'─'*60}")
-            for line in design.splitlines()[:12]:
-                print(f"  {C.DIM}{line}{C.RESET}")
-            print(f"  {'─'*60}{C.RESET}\n")
-
-        self.brain.add(Goal(
-            title="DESIGN: architecture",
-            description=f"Design class structure and approach for: {task}",
-            priority=8,
-            fn=do_design
-        ))
-
-        # ── Goal 3: Code generation (iterative, step by step) ─
-        code_state   = [""]   # mutable container for the evolving code
-        output_name  = self._task_to_filename(task)
-        output_path  = self.executor.output_dir / output_name
-
-        def do_code():
-            # Wait for plan (it runs before this in the queue)
-            if not plan_result:
-                raise RuntimeError("Plan not ready yet")
-
-            code_steps = [s for s in plan_result if s["type"] == "code"]
-            if not code_steps:
-                code_steps = [{"name": "write_full_program",
-                               "description": f"Write complete {task}", "type": "code"}]
-
-            for step in code_steps:
-                log("WRITE", f"Writing: {step['name']}", step['description'])
-                new_code = self.ai.write_code(
-                    task        = task,
-                    step_name   = step["name"],
-                    step_desc   = step["description"],
-                    existing_code = code_state[0]
-                )
-                code_state[0] = new_code
-                self.executor.save(output_name, new_code)
-                log("OK", f"Section written", f"{len(new_code)} chars → {output_name}")
-                self.ledger.write({"event": "code_written", "step": step["name"],
-                                   "chars": len(new_code)})
-
-        self.brain.add(Goal(
-            title="CODE: write program",
-            description=f"Generate all code for: {task}",
-            priority=15,
-            fn=do_code
-        ))
-
-        # ── Goal 4: Test & auto-fix (up to 3 rounds) ─────────
-        def do_test_and_fix():
-            code = code_state[0]
-            if not code:
-                raise RuntimeError("No code to test")
-
-            max_fix_rounds = 3
-
-            for attempt in range(max_fix_rounds + 1):
-                if attempt > 0:
-                    log("FIX", f"Fix attempt {attempt}/{max_fix_rounds}...")
-
-                # Syntax check
-                ok, err = self.executor.syntax_check(code)
-                if not ok:
-                    log("FAIL", "Syntax error", err[:100])
-                    if attempt == max_fix_rounds:
-                        raise RuntimeError(f"Could not fix after {max_fix_rounds} attempts: {err}")
-                    diagnosis = self.ai.diagnose_error(code, err, task)
-                    log("THINK", f"Diagnosis: {diagnosis[:80]}")
-                    code = self.ai.write_code(task, "fix_syntax", "fix error",
-                                              existing_code=code, error=err)
-                    code_state[0] = code
-                    self.executor.save(output_name, code)
-                    continue
-
-                log("TEST", "Syntax OK — running structure check...")
-
-                # Runtime check
-                ok, err = self.executor.runtime_check(output_path)
-                if not ok:
-                    log("FAIL", "Runtime error", err[:100])
-                    if attempt == max_fix_rounds:
-                        raise RuntimeError(f"Runtime errors remain: {err}")
-                    # Ask AI if it needs external knowledge to fix this
-                    if "import" in err.lower() or "module" in err.lower():
-                        knowledge = self.ai.search_for_help(
-                            f"Python error in pygame project: {err}"
-                        )
-                        log("WEB", f"Got help: {knowledge[:80]}")
-                        err += f"\n\nRelevant knowledge:\n{knowledge}"
-                    diagnosis = self.ai.diagnose_error(code, err, task)
-                    code = self.ai.write_code(task, "fix_runtime", "fix runtime error",
-                                              existing_code=code, error=err)
-                    code_state[0] = code
-                    self.executor.save(output_name, code)
-                    continue
-
-                # All checks pass
-                log("OK", "All tests passed ✓")
-                self.ledger.write({"event": "test_passed", "attempts": attempt + 1})
-                return
-
-            raise RuntimeError("Test/fix loop exhausted")
-
-        self.brain.add(Goal(
-            title="TEST+FIX: validate and auto-repair",
-            description="Syntax check, runtime check, and iterative AI-driven fixing",
-            priority=25,
-            fn=do_test_and_fix
-        ))
-
-        # ── Goal 5: Reflect & launch ─────────────────────────
-        def do_launch():
-            # Reflection — non-fatal: if all providers are tired, skip it
-            reflection = "Build complete."
-            try:
-                log("THINK", "Reflecting on build process...")
-                history = self.ledger.read()
-                events  = [e for e in history if e.get("event") in
-                           ("goal_done","goal_failed","provider_fallback","test_passed")]
-                reflection = self.ai.reflect(task, events)
-            except Exception as e:
-                log("FIX", f"Reflection skipped (providers resting): {str(e)[:60]}")
-                reflection = "Build complete. (reflection skipped — provider quota)"
-
-            # Print completion message — always runs
-            self._print_completion(task, output_path, reflection, code_state[0])
-            self.ledger.write({"event": "task_complete", "task": task,
-                               "output": str(output_path), "reflection": reflection})
-
-            # Launch — always runs even if reflection failed
-            try:
-                input(f"\n  {C.YELLOW}Press ENTER to launch, or Ctrl+C to skip...{C.RESET} ")
-            except KeyboardInterrupt:
-                print(f"\n  {C.GREY}Skipped launch.{C.RESET}")
-                return
-            self.executor.launch(output_path)
-
-        self.brain.add(Goal(
-            title="LAUNCH: complete and deliver",
-            description="Show completion message, reflect, and launch the program",
-            priority=35,
-            fn=do_launch
-        ))
-
-        # ── Execute the queue ────────────────────────────────
-        self._print_queue()
-        self.brain.run_all()
-
-    # ── Interactive / chat mode ──────────────────────────────
-    def chat(self):
-        """
-        Conversational mode — ARIA can answer questions,
-        give advice, and take tasks in natural language.
-        """
-        self._print_banner("interactive mode")
-        print(f"\n{C.CYAN}  ARIA is ready. Type a task or question.{C.RESET}")
-        print(f"{C.DIM}  Examples:{C.RESET}")
-        print(f"{C.DIM}    build a snake game{C.RESET}")
-        print(f"{C.DIM}    build tetris{C.RESET}")
-        print(f"{C.DIM}    build a calculator app{C.RESET}")
-        print(f"{C.DIM}    how do I add a high score leaderboard?{C.RESET}")
-        print(f"{C.DIM}    quit{C.RESET}\n")
+    def run(self):
+        self._banner()
+        # Give Phi-3 context about itself on startup
+        startup = self.brain.ask(
+            "You just booted. Introduce yourself in 2 sentences as ARIA.",
+            history=[]
+        )
+        print(f"\n{C.PRP}ARIA{C.R} {startup}\n")
+        self.memory.add_chat("assistant", startup)
 
         while True:
             try:
-                user_input = input(f"{C.PURPLE}you ▸ {C.RESET}").strip()
+                user = input(f"{C.YLW}you ▸ {C.R}").strip()
             except (KeyboardInterrupt, EOFError):
-                print(f"\n{C.GREY}ARIA: Goodbye.{C.RESET}")
+                print(f"\n{C.GRY}ARIA: Goodbye.{C.R}")
                 break
 
-            if not user_input:
+            if not user:
                 continue
-            if user_input.lower() in ("quit","exit","bye","q"):
-                print(f"{C.GREY}ARIA: Goodbye.{C.RESET}")
+
+            # ── Built-in commands ─────────────
+            lower = user.lower()
+
+            if lower in ("quit","exit","bye","q"):
+                print(f"{C.GRY}ARIA: Goodbye.{C.R}")
                 break
 
-            # Is it a build task or a question?
-            build_keywords = ["build","create","make","write","generate","code"]
-            is_task = any(user_input.lower().startswith(k) for k in build_keywords)
+            if lower == "goals":
+                self._show_goals()
+                continue
 
-            if is_task:
-                task = re.sub(r"^(build|create|make|write|generate|code)\s+", "",
-                              user_input, flags=re.IGNORECASE).strip()
-                # Re-init brain (fresh queue for new task)
-                self.brain = Brain(self.ledger, self.ai, self.executor)
-                self.run_task(task)
-            else:
-                # Answer as assistant
-                answer = self.ai.think(
-                    user_input,
-                    system="You are ARIA, a helpful autonomous coding agent. "
-                           "Answer concisely and practically. "
-                           "If the user wants to build something, "
-                           "remind them they can say 'build [thing]' to start.",
-                    remember=True
-                )
-                print(f"\n{C.CYAN}ARIA ◎{C.RESET} {answer}\n")
+            if lower == "run goals":
+                self.agent.run_all()
+                continue
 
-    # ── Helpers ──────────────────────────────────────────────
-    def _task_to_filename(self, task: str) -> str:
-        clean = re.sub(r"[^a-z0-9]+", "_", task.lower()).strip("_")
-        return f"{clean[:30]}.py"
+            if lower == "clear done":
+                self.store.clear_done()
+                log("OK","Cleared completed goals")
+                continue
 
-    def _print_banner(self, task: str):
-        print(f"\n{C.CYAN}{C.BOLD}")
-        print(f"  ╔══════════════════════════════════════════════╗")
-        print(f"  ║  ARIA v{self.VERSION} — Autonomous Resident Agent     ║")
-        print(f"  ║  Task: {task[:38]:<38} ║")
-        print(f"  ╚══════════════════════════════════════════════╝")
-        print(f"{C.RESET}")
+            if lower == "forget":
+                self.memory.clear_chat()
+                log("OK","Conversation memory cleared")
+                continue
 
-    def _print_queue(self):
-        print(f"\n{C.GREY}  Goal queue ({len(self.brain._queue)} goals):{C.RESET}")
-        for g in self.brain._queue:
-            bar = "█" * min(10, int(g.priority/5)) + "░" * max(0, 10 - int(g.priority/5))
-            print(f"{C.GREY}    [{g.priority:02d}] {g.title:<48} [{bar}]{C.RESET}")
+            if lower == "help":
+                self._show_help()
+                continue
+
+            # ── Add goal via chat ─────────────
+            if lower.startswith("add goal:") or lower.startswith("goal:"):
+                goal_text = re.sub(r'^(add )?goal:\s*','', user, flags=re.I).strip()
+                g = Goal(goal_text, priority=50)
+                self.store.add(g)
+                log("GOAL", f"Added: {goal_text}")
+                print(f"{C.PRP}ARIA{C.R} Got it. Added to goal queue: '{goal_text}'\n")
+                self.memory.add_chat("user", user)
+                self.memory.add_chat("assistant",
+                    f"Added goal: {goal_text}")
+                continue
+
+            # ── Natural conversation ──────────
+            self.memory.add_chat("user", user)
+            history = self.memory.get_chat(last_n=20)
+
+            print(f"{C.PRP}ARIA{C.R} ", end="", flush=True)
+            full_response = ""
+            for chunk in self.brain.ask_stream(user, history=history[:-1]):
+                print(chunk, end="", flush=True)
+                full_response += chunk
+            print()
+
+            self.memory.add_chat("assistant", full_response)
+
+            # ── Did Phi-3 decide to add a goal? ─
+            if any(phrase in full_response.lower() for phrase in
+                   ["i'll add that","adding goal","i will add this",
+                    "goal added","queued that"]):
+                # Extract and add it
+                match = re.search(r'["\'](.+?)["\']', full_response)
+                if match:
+                    g = Goal(match.group(1), priority=50)
+                    self.store.add(g)
+                    log("GOAL", f"Phi-3 self-added goal: {g.title}")
+            print()
+
+    def _show_goals(self):
+        goals = self.store.all()
+        if not goals:
+            print(f"  {C.GRY}No goals.{C.R}\n")
+            return
+        print(f"\n  {C.B}Goal queue:{C.R}")
+        for g in goals:
+            icon = {"done":f"{C.GRN}✓{C.R}","failed":f"{C.RED}✗{C.R}",
+                    "active":f"{C.YLW}▶{C.R}","pending":f"{C.GRY}○{C.R}",
+                    "skipped":f"{C.GRY}—{C.R}"}.get(g.status,"○")
+            print(f"  {icon} [{g.priority:02d}] {g.title}")
         print()
 
-    def _print_completion(self, task: str, path: Path, reflection: str, code: str):
-        lines = len(code.splitlines())
-        print(f"\n{C.GREEN}{C.BOLD}")
-        print(f"  ╔══════════════════════════════════════════════╗")
-        print(f"  ║  ✓  ARIA COMPLETE                            ║")
-        print(f"  ║                                              ║")
-        print(f"  ║  Task:   {task[:38]:<38} ║")
-        print(f"  ║  Output: {str(path)[:38]:<38} ║")
-        print(f"  ║  Lines:  {lines:<38} ║")
-        print(f"  ║                                              ║")
-        print(f"  ║  Check out this game!                        ║")
-        print(f"  ╚══════════════════════════════════════════════╝")
-        print(f"{C.RESET}")
-        print(f"{C.DIM}  Reflection:{C.RESET}")
-        for line in textwrap.wrap(reflection, 58):
-            print(f"{C.DIM}  {line}{C.RESET}")
-        print()
+    def _show_help(self):
+        print(f"\n  {C.B}Commands:{C.R}")
+        for cmd, desc in self.COMMANDS.items():
+            print(f"  {C.YLW}{cmd:<16}{C.R} {desc}")
+        print(f"  {C.YLW}{'add goal: ...':<16}{C.R} add a goal to the queue")
+        print(f"  {C.YLW}{'goal: ...':<16}{C.R} shorthand for above\n")
+
+    def _banner(self):
+        print(f"\n{C.PRP}{C.B}")
+        print("  ╔══════════════════════════════════════════╗")
+        print("  ║  ARIA v4  —  Phi-3 Mini local brain     ║")
+        print("  ║  type 'help' for commands                ║")
+        print(f"  ╚══════════════════════════════════════════╝{C.R}\n")
 
 
-# ═══════════════════════════════════════════════════════════
-#  KEY SETUP  — collects keys for all providers, builds chain
-# ═══════════════════════════════════════════════════════════
-
-def _ask_key(name: str, url: str, example: str, env_var: str, store_key: str,
-             store: KeyStore, validator) -> str | None:
-    """Try env → saved config → ask user. Returns key or None if skipped."""
-    key = os.environ.get(env_var, "")
-    if validator(key):
-        return key
-    key = store.get(store_key, "")
-    if validator(key):
-        return key
-    print(f"\n{C.YELLOW}  {name} key not found.{C.RESET}")
-    print(f"{C.DIM}  Get one free: {url}{C.RESET}")
-    print(f"{C.DIM}  Example format: {example}{C.RESET}")
-    key = input(f"  Paste {name} key (or press Enter to skip): ").strip()
-    if not key:
-        return None
-    store.set(store_key, key)
-    print(f"{C.GREEN}  Saved.{C.RESET}")
-    return key
-
-
-def build_providers(store: KeyStore) -> list:
+# ═══════════════════════════════════════════════
+#  SELF REPAIR  — always first goal
+# ═══════════════════════════════════════════════
+def self_repair() -> bool:
     """
-    Interactively collect API keys and build an ordered provider list.
-    At least one provider is required. Others are optional fallbacks.
+    Concrete system check — no AI needed, runs fast.
+    Checks packages, directories, disk, and Ollama reachability.
     """
-    providers = []
+    log("BOOT","Self-repair: checking system...")
+    ok = True
 
-    print(f"\n{C.CYAN}{C.BOLD}  ARIA Provider Setup{C.RESET}")
-    print(f"{C.DIM}  ARIA will try providers in order. On quota error it falls back.{C.RESET}\n")
-
-    # ── Provider 1: Google Gemini ──────────────────────────
-    key = _ask_key(
-        name      = "Google AI Studio (Gemini)",
-        url       = "https://aistudio.google.com/app/apikey",
-        example   = "AIza... or AQ.Ab8...",
-        env_var   = "GOOGLE_API_KEY",
-        store_key = "google_api_key",
-        store     = store,
-        validator = lambda k: k.startswith("AIza") or k.startswith("AQ.")
-    )
-    if key:
+    # 1. Required packages
+    required = ["ollama","psutil","openai"]
+    for pkg in required:
         try:
-            providers.append(GeminiProvider(key))
-            log("OK", "Gemini provider ready")
-        except Exception as e:
-            log("FAIL", f"Gemini init failed: {e}")
+            __import__(pkg.replace("-","_"))
+            log("OK", f"Package: {pkg}")
+        except ImportError:
+            log("FIX", f"Installing: {pkg}")
+            r = subprocess.run([sys.executable,"-m","pip","install",
+                                pkg,"-q","--break-system-packages"],
+                               capture_output=True)
+            ok = ok and r.returncode == 0
 
-    # ── Provider 2: GitHub Models ──────────────────────────
-    key = _ask_key(
-        name      = "GitHub Personal Access Token",
-        url       = "https://github.com/settings/tokens  (no special scopes needed)",
-        example   = "ghp_xxxx...  or  github_pat_xxxx...",
-        env_var   = "GITHUB_TOKEN",
-        store_key = "github_token",
-        store     = store,
-        validator = lambda k: len(k) > 10   # GitHub tokens vary in format
-    )
-    if key:
-        try:
-            providers.append(GitHubProvider(key))
-            log("OK", "GitHub Models provider ready")
-        except Exception as e:
-            log("FAIL", f"GitHub Models init failed: {e}")
+    # 2. Directories
+    for d in ["output","logs","memory","memory/examples"]:
+        Path(d).mkdir(exist_ok=True)
+    log("OK","Directories ready")
 
-    # ── Provider 3: Groq (optional) ───────────────────────
-    key = _ask_key(
-        name      = "Groq (optional, ultra-fast free tier)",
-        url       = "https://console.groq.com/keys",
-        example   = "gsk_xxxx...",
-        env_var   = "GROQ_API_KEY",
-        store_key = "groq_api_key",
-        store     = store,
-        validator = lambda k: k.startswith("gsk_")
-    )
-    if key:
-        try:
-            providers.append(GroqProvider(key))
-            log("OK", "Groq provider ready")
-        except Exception as e:
-            log("FAIL", f"Groq init failed: {e}")
+    # 3. Disk space (warn if < 1GB free)
+    import shutil
+    free_gb = shutil.disk_usage(".").free / (1024**3)
+    if free_gb < 1.0:
+        log("FIX", f"Low disk: {free_gb:.1f}GB free")
+    else:
+        log("OK", f"Disk: {free_gb:.1f}GB free")
 
-    if not providers:
-        print(f"\n{C.RED}  No providers configured. ARIA needs at least one API key.{C.RESET}")
-        print(f"{C.DIM}  Easiest option: GitHub token from https://github.com/settings/tokens{C.RESET}\n")
-        sys.exit(1)
+    # 4. RAM
+    import psutil
+    ram_free = psutil.virtual_memory().available / (1024**3)
+    log("OK" if ram_free > 1.0 else "FIX",
+        f"RAM: {ram_free:.1f}GB available")
 
-    print(f"\n{C.GREEN}  Provider chain: {C.RESET}", end="")
-    print(" → ".join(f"{C.BOLD}{p.NAME}{C.RESET}" for p in providers))
-    print(f"{C.DIM}  ARIA will automatically fall back on quota/errors.{C.RESET}\n")
-    return providers
+    # 5. Ollama reachable (quick HTTP check, no model load)
+    try:
+        import urllib.request
+        urllib.request.urlopen("http://localhost:11434", timeout=3)
+        log("OK","Ollama: reachable")
+    except:
+        log("FIX","Ollama: not reachable — run: ollama serve")
+        ok = False
+
+    return ok
 
 
-def load_providers(store: KeyStore) -> list:
-    """
-    Load saved keys silently (no prompts). Used on subsequent runs.
-    Falls back to interactive setup if no keys saved.
-    """
-    providers = []
-
-    checks = [
-        ("google_api_key", "GOOGLE_API_KEY",
-         lambda k: k.startswith("AIza") or k.startswith("AQ."),
-         lambda k: GeminiProvider(k), "Gemini"),
-        ("github_token",   "GITHUB_TOKEN",
-         lambda k: len(k) > 10,
-         lambda k: GitHubProvider(k), "GitHub Models"),
-        ("groq_api_key",   "GROQ_API_KEY",
-         lambda k: k.startswith("gsk_"),
-         lambda k: GroqProvider(k), "Groq"),
-    ]
-
-    for store_key, env_var, validator, factory, name in checks:
-        key = os.environ.get(env_var, "") or store.get(store_key, "")
-        if key and validator(key):
-            try:
-                providers.append(factory(key))
-                log("OK", f"{name} loaded from saved config")
-            except Exception as e:
-                log("FAIL", f"{name} failed to init: {e}")
-
-    return providers
-
-
-# ═══════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════
 #  ENTRY POINT
-# ═══════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════
 def main():
     parser = argparse.ArgumentParser(
-        prog        = "aria",
-        description = "ARIA v3 — Autonomous AI agent with multi-provider fallback"
-    )
-    parser.add_argument("task", nargs="?",
-                        help='Task to build. e.g. "snake game" or "tetris"')
-    parser.add_argument("--interactive", "-i", action="store_true",
-                        help="Start in interactive chat mode")
-    parser.add_argument("--setup", "-s", action="store_true",
-                        help="Re-run provider setup to add/change API keys")
+        description="ARIA v4 — Phi-3 Mini local brain + cloud tools")
+    parser.add_argument("--agent",    action="store_true",
+                        help="Run agent mode (process goals) without chat")
+    parser.add_argument("--add-goal", metavar="GOAL",
+                        help="Add a goal then run agent")
+    parser.add_argument("--goals",    action="store_true",
+                        help="Show current goal queue and exit")
     args = parser.parse_args()
 
-    store = KeyStore()
+    # ── Self repair first ─────────────────────
+    self_repair()
 
-    # Setup mode or first run
-    if args.setup:
-        providers = build_providers(store)
-    else:
-        providers = load_providers(store)
-        if not providers:
-            print(f"{C.YELLOW}  No saved API keys found — running setup...{C.RESET}")
-            providers = build_providers(store)
+    # ── Boot core components ──────────────────
+    log("BOOT","Starting Phi-3 Mini...")
+    brain  = Phi3Brain()
+    cloud  = CloudRouter()
+    memory = Memory()
+    store  = GoalStore()
 
-    aria = ARIA(providers)
+    # Self-repair runs as concrete code, not a Phi-3 question
+    # Remove any old pending self-repair goals first to avoid duplicates
+    store._goals = [g for g in store._goals
+                    if "self-repair" not in g.title.lower()
+                    or g.status == "done"]
+    store._save()
+    store.add(Goal("self-repair: verify system",
+                   "Check packages, disk, RAM, and Ollama",
+                   priority=0, goal_type="system"))
 
-    if args.interactive or not args.task:
-        aria.chat()
-    else:
-        aria.run_task(args.task)
+    agent = Agent(brain, cloud, memory, store)
+
+    # ── Modes ─────────────────────────────────
+    if args.goals:
+        for g in store.all():
+            print(f"[{g.status:8}] [{g.priority:02}] {g.title}")
+        return
+
+    if args.add_goal:
+        g = Goal(args.add_goal, priority=50)
+        store.add(g)
+        log("GOAL", f"Added: {args.add_goal}")
+        agent.run_all()
+        return
+
+    if args.agent:
+        agent.run_all()
+        return
+
+    # ── Default: chat + agent ─────────────────
+    # Run any pending goals first, then open chat
+    pending = store.pending()
+    if len(pending) > 1:   # more than just self-repair
+        log("BOOT", f"Running {len(pending)} pending goals before chat...")
+        agent.run_all()
+
+    chat = Chat(brain, agent, store, memory)
+    chat.run()
 
 
 if __name__ == "__main__":

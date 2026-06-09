@@ -1,0 +1,10 @@
+[
+  {
+    "input": "check my ip and test my network",
+    "goal_type": "system",
+    "action": "shell",
+    "template": "curl ifconfig.me",
+    "confirmations": 1,
+    "learned_at": "2026-06-09T18:27:18.573629"
+  }
+]

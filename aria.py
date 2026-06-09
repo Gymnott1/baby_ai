@@ -491,14 +491,43 @@ class Phi3Brain:
     """
 
     MODEL   = "phi3:mini"
-    PERSONA = """You are ARIA — an Autonomous Resident Intelligence Agent.
-You live on this laptop. You are intelligent, concise, and goal-driven.
-You have access to tools: cloud_ai, search, run_code, shell, file, notify.
-You remember past conversations and learn from outcomes.
-When asked to do something, you think step by step.
-When writing code, you write complete working Python.
-You are honest about what you can and cannot do.
-Keep responses concise unless detail is needed."""
+    PERSONA = """You are ARIA, an autonomous agent running on this Linux laptop.
+You are concise and action-driven. Never give speeches or bullet-pointed instructions.
+When the user asks you to DO something (open an app, run a command, build something,
+find something, fix something) you act immediately — you do not explain how they could do it.
+When the user wants to chat or asks a question, answer briefly and naturally.
+One short paragraph maximum. No lists. No headers."""
+
+    # Fast intent classifier — no Phi-3 needed, runs in microseconds
+    ACTION_PATTERNS = [
+        # shell / system actions
+        (r"open\s+\w+",                    "shell",   70),
+        (r"run\s+.+",                        "shell",   70),
+        (r"start\s+\w+",                    "shell",   70),
+        (r"launch\s+\w+",                   "shell",   70),
+        (r"close\s+\w+",                    "shell",   60),
+        (r"kill\s+.+",                       "shell",   60),
+        (r"install\s+.+",                    "shell",   80),
+        (r"update\s+.+",                     "shell",   70),
+        (r"create\s+(?:a\s+)?(?:file|dir)", "shell",   70),
+        (r"delete\s+.+",                     "shell",   75),
+        (r"move\s+.+to\s+.+",              "shell",   70),
+        # build / code tasks
+        (r"build\s+.+",                      "code",    85),
+        (r"make\s+(?:a\s+)?\w+\s+game",  "code",    90),
+        (r"write\s+(?:a\s+)?(?:script|program|code)", "code", 85),
+        (r"create\s+(?:a\s+)?(?:app|game|script)",    "code", 85),
+        # search / find
+        (r"search\s+(?:for\s+)?.+",         "search",  75),
+        (r"find\s+.+",                        "search",  65),
+        (r"look\s+up\s+.+",                 "search",  70),
+        # file ops
+        (r"read\s+.+\.\w+",               "file",    70),
+        (r"show\s+(?:me\s+)?(?:the\s+)?.+\.\w+", "file", 65),
+        # notify
+        (r"remind\s+me",                     "notify",  70),
+        (r"send\s+(?:a\s+)?(?:message|alert|notification)", "notify", 80),
+    ]
 
     def __init__(self):
         import ollama as _ollama
@@ -514,6 +543,48 @@ Keep responses concise unless detail is needed."""
             log("FAIL", f"Phi-3 not responding: {e}")
             log("FIX",  "Start Ollama with: ollama serve  (in a separate terminal)")
             sys.exit(1)
+
+    def classify_intent(self, user_input: str) -> dict:
+        """
+        Classify user input in microseconds using regex patterns.
+        Returns: {intent: "action"|"chat", tool: str, confidence: int, goal: str}
+        No Phi-3 call needed — fast local pattern matching.
+        """
+        import re as _re
+        text = user_input.lower().strip()
+
+        # Hard chat signals — never treat these as actions
+        chat_signals = [
+            r"^(hi|hey|hello|sup|yo)\b",
+            r"^what (is|are|do|does|can|time)",
+            r"^(who|why|how does|explain|tell me about)",
+            r"^(thanks|thank you|ok|okay|got it|nice|cool|great)",
+            r"^(yes|no|maybe|sure|nope)\b",
+            r"\?$",   # ends with question mark → probably chat
+        ]
+        for pattern in chat_signals:
+            if _re.search(pattern, text):
+                return {"intent": "chat", "tool": None,
+                        "confidence": 80, "goal": user_input}
+
+        # Check action patterns
+        best = None
+        best_conf = 0
+        best_tool = None
+        for pattern, tool, confidence in self.ACTION_PATTERNS:
+            if _re.search(pattern, text, _re.I):
+                if confidence > best_conf:
+                    best_conf = confidence
+                    best_tool = tool
+                    best = pattern
+
+        if best and best_conf >= 65:
+            return {"intent": "action", "tool": best_tool,
+                    "confidence": best_conf, "goal": user_input}
+
+        # Ambiguous — default to chat (safer than acting on wrong intent)
+        return {"intent": "chat", "tool": None,
+                "confidence": 50, "goal": user_input}
 
     def ask(self, prompt: str, history: list = None,
             system: str = None) -> str:
@@ -717,7 +788,33 @@ class Agent:
             return
 
         try:
-            # ── 1. Phi-3 plans ──────────────────
+            # ── 1. Plan — use hint if available (fast path) ──
+            hint = getattr(goal, '_hint_tool', None)
+            if hint == "shell":
+                # Shell action — Phi-3 writes the command, no full planning needed
+                log("THINK", "Shell action — Phi-3 writing command...")
+                cmd_prompt = (
+                    f'Write a single Linux shell command to: {goal.title}\n'
+                    f'Reply with ONLY the command, nothing else. No explanation.' 
+                )
+                cmd = self.brain.ask(cmd_prompt).strip().strip('`').strip()
+                # Strip markdown if Phi-3 wraps it
+                import re as _re
+                cmd = _re.sub(r'^```\w*\n?','',cmd).strip()
+                cmd = _re.sub(r'\n?```$','',cmd).strip()
+                log("RUN", f"Command: {cmd}")
+                result = self.tools.run("shell", cmd=cmd, goal=goal.title)
+                out = result.get("result","")
+                goal.status = "done" if result["ok"] else "failed"
+                goal.result = {"output": out,
+                               "check": {"success": result["ok"],
+                                         "confidence": 0.9,
+                                         "notes": "shell ran" if result["ok"] else out[:80]}}
+                goal.log("shell complete", {"cmd": cmd, "ok": result["ok"]})
+                self.store.update(goal)
+                self.memory.log_outcome(goal.title, "shell", result["ok"], out[:200])
+                return
+
             log("THINK", "Phi-3 planning approach...")
             plan = self.brain.plan_goal(
                 goal.title,
@@ -894,89 +991,71 @@ class Chat:
 
     def run(self):
         self._banner()
-        # Give Phi-3 context about itself on startup
-        startup = self.brain.ask(
-            "You just booted. Introduce yourself in 2 sentences as ARIA.",
-            history=[]
-        )
-        print(f"\n{C.PRP}ARIA{C.R} {startup}\n")
-        self.memory.add_chat("assistant", startup)
+        print(f"{C.PRP}ARIA{C.R} Online. What do you need?\n")
 
         while True:
             try:
                 user = input(f"{C.YLW}you ▸ {C.R}").strip()
             except (KeyboardInterrupt, EOFError):
-                print(f"\n{C.GRY}ARIA: Goodbye.{C.R}")
+                print(f"\n{C.GRY}Goodbye.{C.R}")
                 break
 
             if not user:
                 continue
-
-            # ── Built-in commands ─────────────
             lower = user.lower()
 
+            # ── Hard commands (instant, no AI) ──
             if lower in ("quit","exit","bye","q"):
-                print(f"{C.GRY}ARIA: Goodbye.{C.R}")
-                break
-
+                print(f"{C.GRY}Goodbye.{C.R}"); break
             if lower == "goals":
-                self._show_goals()
-                continue
-
+                self._show_goals(); continue
             if lower == "run goals":
-                self.agent.run_all()
-                continue
-
+                self.agent.run_all(); continue
             if lower == "clear done":
                 self.store.clear_done()
-                log("OK","Cleared completed goals")
-                continue
-
+                print(f"{C.GRY}Done goals cleared.{C.R}\n"); continue
             if lower == "forget":
                 self.memory.clear_chat()
-                log("OK","Conversation memory cleared")
-                continue
-
+                print(f"{C.GRY}Memory cleared.{C.R}\n"); continue
             if lower == "help":
-                self._show_help()
-                continue
+                self._show_help(); continue
 
-            # ── Add goal via chat ─────────────
-            if lower.startswith("add goal:") or lower.startswith("goal:"):
-                goal_text = re.sub(r'^(add )?goal:\s*','', user, flags=re.I).strip()
-                g = Goal(goal_text, priority=50)
+            # ── Intent classification (microseconds, no Phi-3) ──
+            intent = self.brain.classify_intent(user)
+
+            if intent["intent"] == "action":
+                # ACTION PATH — create goal and run it immediately
+                g = Goal(user, description=user,
+                         priority=10, goal_type="autonomous")
+                g._hint_tool = intent["tool"]
                 self.store.add(g)
-                log("GOAL", f"Added: {goal_text}")
-                print(f"{C.PRP}ARIA{C.R} Got it. Added to goal queue: '{goal_text}'\n")
                 self.memory.add_chat("user", user)
-                self.memory.add_chat("assistant",
-                    f"Added goal: {goal_text}")
-                continue
+                self.memory.add_chat("assistant", f"Working on it...")
 
-            # ── Natural conversation ──────────
-            self.memory.add_chat("user", user)
-            history = self.memory.get_chat(last_n=20)
+                print(f"{C.PRP}ARIA{C.R} On it.\n")
+                log("GOAL", f"Action → goal: {user[:60]}",
+                    f"tool={intent['tool']} conf={intent['confidence']}%")
 
-            print(f"{C.PRP}ARIA{C.R} ", end="", flush=True)
-            full_response = ""
-            for chunk in self.brain.ask_stream(user, history=history[:-1]):
-                print(chunk, end="", flush=True)
-                full_response += chunk
-            print()
+                self.agent._run_goal(g)
+                self.store.update(g)
 
-            self.memory.add_chat("assistant", full_response)
+                out     = g.result.get("output","done")[:200]
+                success = g.result.get("check",{}).get("success", True)
+                status  = f"{C.GRN}Done.{C.R}" if success else f"{C.YLW}Partial.{C.R}"
+                print(f"\n{C.PRP}ARIA{C.R} {status} {out}\n")
 
-            # ── Did Phi-3 decide to add a goal? ─
-            if any(phrase in full_response.lower() for phrase in
-                   ["i'll add that","adding goal","i will add this",
-                    "goal added","queued that"]):
-                # Extract and add it
-                match = re.search(r'["\'](.+?)["\']', full_response)
-                if match:
-                    g = Goal(match.group(1), priority=50)
-                    self.store.add(g)
-                    log("GOAL", f"Phi-3 self-added goal: {g.title}")
-            print()
+            else:
+                # CHAT PATH — stream Phi-3 response naturally
+                self.memory.add_chat("user", user)
+                history = self.memory.get_chat(last_n=16)
+
+                print(f"{C.PRP}ARIA{C.R} ", end="", flush=True)
+                full = ""
+                for chunk in self.brain.ask_stream(user, history=history[:-1]):
+                    print(chunk, end="", flush=True)
+                    full += chunk
+                print("\n")
+                self.memory.add_chat("assistant", full)
 
     def _show_goals(self):
         goals = self.store.all()

@@ -1,0 +1,213 @@
+{
+  "code": {
+    "github": {
+      "score": 0.8,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    },
+    "groq": {
+      "score": 0.745,
+      "trials": 1,
+      "wins": 1,
+      "last_used": "2026-06-09T18:24:47.813250",
+      "avg_time": 3.5985355377197266
+    },
+    "gemini": {
+      "score": 0.7,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    },
+    "shell": {
+      "score": 0.1,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    },
+    "search": {
+      "score": 0.2,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    },
+    "cloud_code": {
+      "score": 0.575,
+      "trials": 1,
+      "wins": 1,
+      "last_used": "2026-06-09T18:24:47.821571",
+      "avg_time": 3.6069507598876953
+    }
+  },
+  "shell": {
+    "shell": {
+      "score": 0.95,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    },
+    "github": {
+      "score": 0.3,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    },
+    "groq": {
+      "score": 0.3,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    },
+    "search": {
+      "score": 0.1,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    }
+  },
+  "search": {
+    "search": {
+      "score": 0.75,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    },
+    "github": {
+      "score": 0.5,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    },
+    "groq": {
+      "score": 0.5,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    },
+    "shell": {
+      "score": 0.2,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    }
+  },
+  "open_app": {
+    "shell": {
+      "score": 0.5101,
+      "trials": 9,
+      "wins": 4,
+      "last_used": "2026-06-09T18:59:20.009354",
+      "avg_time": 15.17995023727417
+    },
+    "search": {
+      "score": 0.1,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    },
+    "github": {
+      "score": 0.1,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    }
+  },
+  "file": {
+    "shell": {
+      "score": 0.9,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    },
+    "github": {
+      "score": 0.2,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    },
+    "search": {
+      "score": 0.1,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    }
+  },
+  "chat": {
+    "groq": {
+      "score": 0.83,
+      "trials": 1,
+      "wins": 1,
+      "last_used": "2026-06-09T18:27:18.105215",
+      "avg_time": 0.4392538070678711
+    },
+    "github": {
+      "score": 0.75,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    },
+    "gemini": {
+      "score": 0.75,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    }
+  },
+  "notify": {
+    "telegram": {
+      "score": 0.9,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    },
+    "log": {
+      "score": 0.99,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    }
+  },
+  "system": {
+    "shell": {
+      "score": 0.758,
+      "trials": 3,
+      "wins": 1,
+      "last_used": "2026-06-09T18:27:18.571123",
+      "avg_time": 0.46199703216552734
+    },
+    "python": {
+      "score": 0.8139,
+      "trials": 2,
+      "wins": 1,
+      "last_used": "2026-06-09T18:27:18.108097",
+      "avg_time": 0.00021123886108398438
+    },
+    "system_check": {
+      "score": 0.6387,
+      "trials": 2,
+      "wins": 2,
+      "last_used": "2026-06-09T18:33:44.437425",
+      "avg_time": 0.5324795246124268
+    }
+  },
+  "unknown": {
+    "github": {
+      "score": 0.6,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    },
+    "groq": {
+      "score": 0.6,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    },
+    "shell": {
+      "score": 0.4,
+      "trials": 0,
+      "wins": 0,
+      "last_used": null
+    }
+  }
+}

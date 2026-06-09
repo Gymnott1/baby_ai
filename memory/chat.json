@@ -28,5 +28,35 @@
     "role": "assistant",
     "content": "\"Hello! I am ARIA (Artificial Reasoning and Interactive Assistant), at your service to help you navigate digital landscapes. To open a Chrome browser, please follow these simple steps:\" \"I'm here for any assistance you might need in navigating the vast resources available on the internet or managing files within various applications.\"",
     "ts": "2026-06-08T01:39:14.469687"
+  },
+  {
+    "role": "user",
+    "content": "open chrome browser",
+    "ts": "2026-06-08T01:48:25.431327"
+  },
+  {
+    "role": "assistant",
+    "content": "Working on it...",
+    "ts": "2026-06-08T01:48:25.431557"
+  },
+  {
+    "role": "user",
+    "content": "search for linux commands",
+    "ts": "2026-06-08T01:49:05.942312"
+  },
+  {
+    "role": "assistant",
+    "content": "Working on it...",
+    "ts": "2026-06-08T01:49:05.942445"
+  },
+  {
+    "role": "user",
+    "content": "build a snake game",
+    "ts": "2026-06-09T17:26:14.737946"
+  },
+  {
+    "role": "assistant",
+    "content": "Working on it...",
+    "ts": "2026-06-09T17:26:14.738233"
   }
 ]

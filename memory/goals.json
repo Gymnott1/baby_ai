@@ -2,10 +2,16 @@
   {
     "id": "19d6fb5e",
     "title": "self-repair: verify system",
-    "status": "done",
+    "goal_type": "unknown",
     "priority": 0,
-    "type": "system",
+    "action": null,
+    "template": null,
+    "groups": [],
+    "source": "user",
+    "status": "done",
     "retries": 0,
+    "result": {},
+    "created": "2026-06-09T18:18:11.608915",
     "history": [
       {
         "ts": "2026-06-08T01:36:08.433817",
@@ -15,12 +21,221 @@
     ]
   },
   {
-    "id": "4f6e02ff",
+    "id": "fae02e6f",
     "title": "self-repair: verify system",
-    "status": "pending",
+    "goal_type": "unknown",
     "priority": 0,
-    "type": "system",
+    "action": null,
+    "template": null,
+    "groups": [],
+    "source": "user",
+    "status": "pending",
     "retries": 0,
+    "result": {},
+    "created": "2026-06-09T18:18:11.608968",
     "history": []
+  },
+  {
+    "id": "2a001aa6",
+    "title": "self-repair",
+    "goal_type": "system",
+    "priority": 0,
+    "action": "system_check",
+    "template": null,
+    "groups": [],
+    "source": "system",
+    "status": "failed",
+    "retries": 0,
+    "result": {
+      "ok": false,
+      "output": "/bin/sh: 1: self-repair: not found",
+      "tool_used": "shell",
+      "elapsed": 0.0041773319244384766
+    },
+    "created": "2026-06-09T18:18:11.609075",
+    "history": [
+      {
+        "ts": "2026-06-09T18:18:11.618284",
+        "msg": "all tools failed",
+        "data": {}
+      }
+    ]
+  },
+  {
+    "id": "2ba85e30",
+    "title": "self-repair",
+    "goal_type": "system",
+    "priority": 0,
+    "action": "system_check",
+    "template": null,
+    "groups": [],
+    "source": "system",
+    "status": "failed",
+    "retries": 0,
+    "result": {
+      "ok": false,
+      "output": "/bin/sh: 1: self-repair: not found",
+      "tool_used": "shell",
+      "elapsed": 0.0019903182983398438
+    },
+    "created": "2026-06-09T18:19:01.428663",
+    "history": [
+      {
+        "ts": "2026-06-09T18:19:06.802319",
+        "msg": "all tools failed",
+        "data": {}
+      }
+    ]
+  },
+  {
+    "id": "319d914b",
+    "title": "self-repair",
+    "goal_type": "system",
+    "priority": 0,
+    "action": "system_check",
+    "template": null,
+    "groups": [],
+    "source": "system",
+    "status": "done",
+    "retries": 0,
+    "result": {
+      "ok": true,
+      "output": "RAM: 5.7/16.5GB (34.6%) | Disk: 315.1GB free of 502.4GB | CPU: 29.2%",
+      "tool_used": "system_check",
+      "elapsed": 0.5342774391174316
+    },
+    "created": "2026-06-09T18:23:42.842133",
+    "history": []
+  },
+  {
+    "id": "6871e5a2",
+    "title": "self-repair",
+    "goal_type": "system",
+    "priority": 0,
+    "action": "system_check",
+    "template": null,
+    "groups": [],
+    "source": "system",
+    "status": "done",
+    "retries": 0,
+    "result": {
+      "ok": true,
+      "output": "RAM: 5.6/16.5GB (34.0%) | Disk: 315.1GB free of 502.4GB | CPU: 8.9%",
+      "tool_used": "system_check",
+      "elapsed": 0.5324795246124268
+    },
+    "created": "2026-06-09T18:33:41.092571",
+    "history": []
+  },
+  {
+    "id": "3b28fac2",
+    "title": "self-repair",
+    "goal_type": "system",
+    "priority": 0,
+    "action": "system_check",
+    "template": null,
+    "groups": [],
+    "source": "system",
+    "status": "pending",
+    "retries": 0,
+    "result": {},
+    "created": "2026-06-09T18:34:59.045921",
+    "history": []
+  },
+  {
+    "id": "333f52ad",
+    "title": "open chrome browser",
+    "goal_type": "unknown",
+    "priority": 10,
+    "action": null,
+    "template": null,
+    "groups": [],
+    "source": "user",
+    "status": "done",
+    "retries": 0,
+    "result": {},
+    "created": "2026-06-09T18:18:11.608995",
+    "history": [
+      {
+        "ts": "2026-06-08T01:48:30.456814",
+        "msg": "shell complete",
+        "data": {
+          "cmd": "google-chrome",
+          "ok": true
+        }
+      }
+    ]
+  },
+  {
+    "id": "62ece39b",
+    "title": "search for linux commands",
+    "goal_type": "unknown",
+    "priority": 10,
+    "action": null,
+    "template": null,
+    "groups": [],
+    "source": "user",
+    "status": "done",
+    "retries": 0,
+    "result": {},
+    "created": "2026-06-09T18:18:11.609014",
+    "history": [
+      {
+        "ts": "2026-06-08T01:49:29.898523",
+        "msg": "planned",
+        "data": {
+          "needs_code": false,
+          "primary_tool": "search",
+          "fallback_tool": "local_phi3",
+          "approach": "Use the search tool to find linux commands and then verify with local phi3 if necessary.",
+          "needs_cloud": true
+        }
+      },
+      {
+        "ts": "2026-06-08T01:49:54.423107",
+        "msg": "completed",
+        "data": {
+          "success": true,
+          "confidence": 0.5,
+          "notes": "heuristic"
+        }
+      }
+    ]
+  },
+  {
+    "id": "6f778291",
+    "title": "build a snake game",
+    "goal_type": "unknown",
+    "priority": 10,
+    "action": null,
+    "template": null,
+    "groups": [],
+    "source": "user",
+    "status": "failed",
+    "retries": 0,
+    "result": {},
+    "created": "2026-06-09T18:18:11.609042",
+    "history": [
+      {
+        "ts": "2026-06-09T17:26:59.253317",
+        "msg": "planned",
+        "data": {
+          "needs_code": true,
+          "primary_tool": "local_phi3",
+          "fallback_tool": "search",
+          "approach": "First develop the game logic and mechanics using local_phi3. Then use search to optimize code for better performance.",
+          "needs_cloud": false
+        }
+      },
+      {
+        "ts": "2026-06-09T17:33:46.691695",
+        "msg": "completed",
+        "data": {
+          "success": false,
+          "confidence": 0.95,
+          "notes": "The goal to 'build a snake game' was skipped due to the project scope being too broad and complex for an initial development phase without further planning."
+        }
+      }
+    ]
   }
 ]

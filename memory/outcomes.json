@@ -14,5 +14,93 @@
     "success": false,
     "summary": "To complete the given goal of verifying a system for self-repair, I will follow these steps to check packages and directories on my Linux operating system. Please replace \"Linux\" with your specific OS",
     "had_code": false
+  },
+  {
+    "ts": "2026-06-08T01:48:30.456104",
+    "goal": "open chrome browser",
+    "tool": "subprocess",
+    "success": true,
+    "summary": "ran ok",
+    "had_code": false
+  },
+  {
+    "ts": "2026-06-08T01:48:30.457308",
+    "goal": "open chrome browser",
+    "tool": "shell",
+    "success": true,
+    "summary": "ran ok",
+    "had_code": false
+  },
+  {
+    "ts": "2026-06-08T01:49:30.891192",
+    "goal": "search for linux commands",
+    "tool": "duckduckgo",
+    "success": false,
+    "summary": "duckduckgo: Expecting value: line 1 column 1 (char 0)",
+    "had_code": false
+  },
+  {
+    "ts": "2026-06-08T01:49:31.987869",
+    "goal": "search for linux commands",
+    "tool": "wikipedia",
+    "success": false,
+    "summary": "no wikipedia result",
+    "had_code": false
+  },
+  {
+    "ts": "2026-06-08T01:49:31.988413",
+    "goal": "search for linux commands",
+    "tool": "local_cache",
+    "success": false,
+    "summary": "not in cache",
+    "had_code": false
+  },
+  {
+    "ts": "2026-06-08T01:49:31.988762",
+    "goal": "search for linux commands",
+    "tool": "skip",
+    "success": true,
+    "summary": "skipped",
+    "had_code": false
+  },
+  {
+    "ts": "2026-06-08T01:49:54.423546",
+    "goal": "search for linux commands",
+    "tool": "search",
+    "success": true,
+    "summary": "skipped",
+    "had_code": false
+  },
+  {
+    "ts": "2026-06-09T17:33:10.243028",
+    "goal": "build a snake game",
+    "tool": "subprocess",
+    "success": false,
+    "summary": "Traceback (most recent call last):\n  File \"/usr/lib/python3.12/curses/__init__.py\", line 78, in wrapper\n    cbreak()\n_curses.error: cbreak() returned ERR\n\nDuring handling of the above exception, anoth",
+    "had_code": false
+  },
+  {
+    "ts": "2026-06-09T17:33:10.252925",
+    "goal": "build a snake game",
+    "tool": "python_exec",
+    "success": false,
+    "summary": "module 'curses' has no attribute 'cursors_set'",
+    "had_code": false
+  },
+  {
+    "ts": "2026-06-09T17:33:10.253823",
+    "goal": "build a snake game",
+    "tool": "log_and_skip",
+    "success": true,
+    "summary": "skipped \u2014 logged",
+    "had_code": false
+  },
+  {
+    "ts": "2026-06-09T17:33:46.693706",
+    "goal": "build a snake game",
+    "tool": "local_phi3",
+    "success": false,
+    "summary": "skipped \u2014 logged",
+    "had_code": true
   }
 ]
